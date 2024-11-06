@@ -51,6 +51,7 @@ export default function Home() {
   const [voteMethod, setVoteMethod] = useState<'select' | 'writeIn'>('select');
   const [selectedCandidate, setSelectedCandidate] = useState<string>('');
   const [writeInName, setWriteInName] = useState('');
+  const [walletAddress, setWalletAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +59,10 @@ export default function Home() {
     setWriteInName(e.target.value);
     setSelectedCandidate('');
     setVoteMethod('writeIn');
+  };
+
+  const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWalletAddress(e.target.value);
   };
 
   const handleCandidateSelect = (presidentName: string) => {
@@ -73,16 +78,17 @@ export default function Home() {
   const handleProof = async (result: ISuccessResult) => {
     const data = await verify(result);
     if (data.success) {
-      console.log("Successful response from backend:\n", JSON.stringify(data)); // Log the response from our backend for visibility
+      console.log("Successful response from backend:\n", JSON.stringify(data));
     } else {
-      throw new Error(`Verification failed: ${data.detail}`);
+      // Optionally handle verification failure
+      // setError(`Verification failed: ${data.detail}`);
     }
 
     try {
       setLoading(true);
       setError(null);
 
-      const candidateName = voteMethod === 'writeIn' ? writeInName : selectedCandidate;
+      const candidateName = voteMethod === 'select' ? selectedCandidate : writeInName;
 
       const response = await fetch("/api/saveVote", {
         method: "POST",
@@ -95,13 +101,13 @@ export default function Home() {
         }),
       });
 
-      const data = await response.json();
+      const saveVoteData = await response.json();
 
-      if (response.ok && data.success) {
-        // Redirect to /success page
+      if (response.ok && saveVoteData.success) {
+        await handleSendXrp(); // Updated function
         router.push('/success');
       } else {
-        setError(data.detail || "Failed to save your vote.");
+        setError(saveVoteData.detail || "Failed to save your vote.");
       }
     } catch (err) {
       console.error("Error during voting:", err);
@@ -112,6 +118,36 @@ export default function Home() {
   };
 
   const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
+
+  const handleSendXrp = async () => { // Updated function name
+    if (walletAddress) {
+      try {
+        console.log('Sending 5 XRP to:', walletAddress);
+        const xrpResponse = await fetch('/api/sendXrp', { // Updated endpoint
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ walletAddress }),
+        });
+
+        const xrpData = await xrpResponse.json();
+        console.log('XRP Transfer Response:', xrpData);
+
+        if (xrpData.success) {
+          console.log('5 XRP successfully sent!');
+        } else {
+          console.error('XRP transfer failed:', xrpData.detail);
+          setError(`XRP transfer failed: ${xrpData.detail}`);
+        }
+      } catch (error: any) {
+        console.error('Error sending XRP:', error);
+        setError(`Error sending XRP: ${error.message}`);
+      }
+    } else {
+      console.log('No wallet address provided, XRP not sent.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -180,6 +216,20 @@ export default function Home() {
               placeholder="Enter presidential candidate name..."
             />
           </div>
+        </div>
+
+        <div className="mb-8">
+          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700">
+            Wallet Address (optional)
+          </label>
+          <input
+            type="text"
+            id="walletAddress"
+            value={walletAddress}
+            onChange={handleWalletAddressChange}
+            className="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter XRP wallet address..."
+          />
         </div>
 
         {/* Verification Section */}
