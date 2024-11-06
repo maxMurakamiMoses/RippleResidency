@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { VerificationLevel, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
-import { verify } from "./actions/verify";
+
+// Define the candidates
+const PREDEFINED_CANDIDATES = [
+  { id: 1, name: "John Smith" },
+  { id: 2, name: "Jane Doe" },
+  { id: 3, name: "Alice Johnson" },
+  { id: 4, name: "Bob Wilson" },
+];
 
 export default function Home() {
   const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
@@ -18,21 +25,23 @@ export default function Home() {
 
   const { setOpen } = useIDKit();
 
-  // State to hold the user's name
-  const [name, setName] = useState("");
-
-  // State to handle loading and error states
+  // State management
+  const [voteMethod, setVoteMethod] = useState<'select' | 'writeIn'>('select');
+  const [selectedCandidate, setSelectedCandidate] = useState<string>('');
+  const [writeInName, setWriteInName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Handle changes in the name input field
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
+  const handleWriteInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWriteInName(e.target.value);
+  };
+
+  const handleCandidateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCandidate(e.target.value);
   };
 
   const onSuccess = (result: ISuccessResult) => {
-    // After successful verification, send data to the backend
     handleProof(result);
   };
 
@@ -42,13 +51,15 @@ export default function Home() {
       setError(null);
       setSuccessMessage(null);
 
+      const candidateName = voteMethod === 'writeIn' ? writeInName : selectedCandidate;
+
       const response = await fetch("/api/saveVote", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          candidateName: name,
+          candidateName,
           nullifierHash: result.nullifier_hash,
         }),
       });
@@ -70,24 +81,76 @@ export default function Home() {
     }
   };
 
+  const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
+
   return (
     <div>
       <div className="flex flex-col items-center justify-center align-middle h-screen px-4">
         <p className="text-2xl mb-5">World ID Cloud Template</p>
         
-        {/* Name Input Field */}
+        {/* Vote Method Selection */}
         <div className="mb-4 w-full max-w-sm">
-          <label htmlFor="name" className="block text-gray-700 mb-2">
-            Enter Your Name:
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={handleNameChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Your Name"
-          />
+          <label className="block text-gray-700 mb-2">Choose your voting method:</label>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setVoteMethod('select')}
+              className={`px-4 py-2 rounded-md ${
+                voteMethod === 'select' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Select Candidate
+            </button>
+            <button
+              onClick={() => setVoteMethod('writeIn')}
+              className={`px-4 py-2 rounded-md ${
+                voteMethod === 'writeIn' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+            >
+              Write-in Candidate
+            </button>
+          </div>
+        </div>
+
+        {/* Candidate Selection or Write-in Input */}
+        <div className="mb-4 w-full max-w-sm">
+          {voteMethod === 'select' ? (
+            <div>
+              <label htmlFor="candidate" className="block text-gray-700 mb-2">
+                Select a candidate:
+              </label>
+              <select
+                id="candidate"
+                value={selectedCandidate}
+                onChange={handleCandidateSelect}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Choose a candidate</option>
+                {PREDEFINED_CANDIDATES.map(candidate => (
+                  <option key={candidate.id} value={candidate.name}>
+                    {candidate.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="writeIn" className="block text-gray-700 mb-2">
+                Write in a candidate name:
+              </label>
+              <input
+                type="text"
+                id="writeIn"
+                value={writeInName}
+                onChange={handleWriteInChange}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Candidate Name"
+              />
+            </div>
+          )}
         </div>
 
         {/* IDKit Verification Widget */}
@@ -95,15 +158,15 @@ export default function Home() {
           action={action}
           app_id={app_id}
           onSuccess={onSuccess}
-          verification_level={VerificationLevel.Device} // Change this to VerificationLevel.Device to accept Orb- and Device-verified users
+          verification_level={VerificationLevel.Device}
         />
 
         {/* Verification Button */}
         <button
-          className="mt-4 border border-black rounded-md px-4 py-2 hover:bg-gray-100"
+          className="mt-4 border border-black rounded-md px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => setOpen(true)}
-          disabled={!name.trim() || loading} // Disable button if name is empty or loading
-          title={!name.trim() ? "Please enter your name to verify" : "Verify with World ID"}
+          disabled={!isVoteValid || loading}
+          title={!isVoteValid ? "Please select or enter a candidate name" : "Verify with World ID"}
         >
           <div className="mx-3 my-1">
             {loading ? "Saving..." : "Verify with World ID"}
