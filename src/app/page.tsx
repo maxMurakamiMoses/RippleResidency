@@ -8,6 +8,7 @@ import type { ISuccessResult } from "@worldcoin/idkit";
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
+import { verify } from "./actions/verify";
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -70,6 +71,13 @@ export default function Home() {
   };
 
   const handleProof = async (result: ISuccessResult) => {
+    const data = await verify(result);
+    if (data.success) {
+      console.log("Successful response from backend:\n", JSON.stringify(data)); // Log the response from our backend for visibility
+    } else {
+      throw new Error(`Verification failed: ${data.detail}`);
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -180,6 +188,7 @@ export default function Home() {
             action={action}
             app_id={app_id}
             onSuccess={onSuccess}
+            handleVerify={handleProof}
             verification_level={VerificationLevel.Device}
           />
 
