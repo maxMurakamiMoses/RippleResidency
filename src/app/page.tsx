@@ -3,13 +3,31 @@
 import { useState } from "react";
 import { VerificationLevel, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 
-// Define the candidates
+// Updated candidates with president and VP
 const PREDEFINED_CANDIDATES = [
-  { id: 1, name: "John Smith" },
-  { id: 2, name: "Jane Doe" },
-  { id: 3, name: "Alice Johnson" },
-  { id: 4, name: "Bob Wilson" },
+  { 
+    id: 1, 
+    president: "John Smith",
+    vicePresident: "Sarah Parker"
+  },
+  { 
+    id: 2, 
+    president: "Jane Doe",
+    vicePresident: "Michael Chen"
+  },
+  { 
+    id: 3, 
+    president: "Alice Johnson",
+    vicePresident: "David Rodriguez"
+  },
+  { 
+    id: 4, 
+    president: "Bob Wilson",
+    vicePresident: "Maria Garcia"
+  },
 ];
 
 export default function Home() {
@@ -35,10 +53,14 @@ export default function Home() {
 
   const handleWriteInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWriteInName(e.target.value);
+    setSelectedCandidate('');
+    setVoteMethod('writeIn');
   };
 
-  const handleCandidateSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCandidate(e.target.value);
+  const handleCandidateSelect = (presidentName: string) => {
+    setSelectedCandidate(presidentName);
+    setWriteInName('');
+    setVoteMethod('select');
   };
 
   const onSuccess = (result: ISuccessResult) => {
@@ -68,14 +90,11 @@ export default function Home() {
 
       if (response.ok && data.success) {
         setSuccessMessage("Your vote has been successfully recorded!");
-        console.log("Vote saved:", data.vote);
       } else {
         setError(data.detail || "Failed to save your vote.");
-        console.error("Error saving vote:", data.detail);
       }
     } catch (err) {
       setError("An unexpected error occurred.");
-      console.error("Unexpected error:", err);
     } finally {
       setLoading(false);
     }
@@ -84,104 +103,115 @@ export default function Home() {
   const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center align-middle h-screen px-4">
-        <p className="text-2xl mb-5">World ID Cloud Template</p>
-        
-        {/* Vote Method Selection */}
-        <div className="mb-4 w-full max-w-sm">
-          <label className="block text-gray-700 mb-2">Choose your voting method:</label>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setVoteMethod('select')}
-              className={`px-4 py-2 rounded-md ${
-                voteMethod === 'select' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Select Candidate
-            </button>
-            <button
-              onClick={() => setVoteMethod('writeIn')}
-              className={`px-4 py-2 rounded-md ${
-                voteMethod === 'writeIn' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Write-in Candidate
-            </button>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Secure Voting Platform
+          </h1>
+          <p className="text-lg text-gray-600">
+            Select your preferred candidates
+          </p>
+        </div>
+
+        {/* Candidate Cards Grid */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="h-6 w-6 text-blue-500" />
+            <h2 className="text-xl font-semibold text-gray-800">
+              Presidential Tickets
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {PREDEFINED_CANDIDATES.map((ticket) => (
+              <Card 
+                key={ticket.id}
+                className={`cursor-pointer transition-all hover:shadow-lg ${
+                  selectedCandidate === ticket.president 
+                    ? 'ring-2 ring-blue-500 shadow-lg' 
+                    : 'hover:border-blue-200'
+                }`}
+                onClick={() => handleCandidateSelect(ticket.president)}
+              >
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center justify-between">
+                    <span>{ticket.president}</span>
+                    {selectedCandidate === ticket.president && (
+                      <CheckCircle2 className="text-blue-500 h-5 w-5" />
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Vice President:</span>
+                    <span className="text-sm font-medium">{ticket.vicePresident}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {/* Candidate Selection or Write-in Input */}
-        <div className="mb-4 w-full max-w-sm">
-          {voteMethod === 'select' ? (
-            <div>
-              <label htmlFor="candidate" className="block text-gray-700 mb-2">
-                Select a candidate:
-              </label>
-              <select
-                id="candidate"
-                value={selectedCandidate}
-                onChange={handleCandidateSelect}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Choose a candidate</option>
-                {PREDEFINED_CANDIDATES.map(candidate => (
-                  <option key={candidate.id} value={candidate.name}>
-                    {candidate.name}
-                  </option>
-                ))}
-              </select>
+        {/* Write-in Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Write-in Candidate
+            </h2>
+            <UserPlus className="h-5 w-5 text-gray-500" />
+          </div>
+          <div className="flex gap-4">
+            <input
+              type="text"
+              value={writeInName}
+              onChange={handleWriteInChange}
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter presidential candidate name..."
+            />
+          </div>
+        </div>
+
+        {/* Verification Section */}
+        <div className="space-y-4">
+          <IDKitWidget
+            action={action}
+            app_id={app_id}
+            onSuccess={onSuccess}
+            verification_level={VerificationLevel.Device}
+          />
+
+          <button
+            className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-white font-medium transition-colors ${
+              isVoteValid && !loading
+                ? 'bg-blue-500 hover:bg-blue-600'
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
+            onClick={() => setOpen(true)}
+            disabled={!isVoteValid || loading}
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <UserCheck className="h-5 w-5" />
+            )}
+            {loading ? "Processing..." : "Verify with World ID"}
+          </button>
+
+          {/* Messages */}
+          {successMessage && (
+            <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-lg">
+              <CheckCircle2 className="h-5 w-5" />
+              <p>{successMessage}</p>
             </div>
-          ) : (
-            <div>
-              <label htmlFor="writeIn" className="block text-gray-700 mb-2">
-                Write in a candidate name:
-              </label>
-              <input
-                type="text"
-                id="writeIn"
-                value={writeInName}
-                onChange={handleWriteInChange}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Candidate Name"
-              />
+          )}
+
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-lg">
+              <AlertCircle className="h-5 w-5" />
+              <p>{error}</p>
             </div>
           )}
         </div>
-
-        {/* IDKit Verification Widget */}
-        <IDKitWidget
-          action={action}
-          app_id={app_id}
-          onSuccess={onSuccess}
-          verification_level={VerificationLevel.Device}
-        />
-
-        {/* Verification Button */}
-        <button
-          className="mt-4 border border-black rounded-md px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() => setOpen(true)}
-          disabled={!isVoteValid || loading}
-          title={!isVoteValid ? "Please select or enter a candidate name" : "Verify with World ID"}
-        >
-          <div className="mx-3 my-1">
-            {loading ? "Saving..." : "Verify with World ID"}
-          </div>
-        </button>
-
-        {/* Success Message */}
-        {successMessage && (
-          <p className="mt-4 text-green-600">{successMessage}</p>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <p className="mt-4 text-red-600">{error}</p>
-        )}
       </div>
     </div>
   );
