@@ -1,12 +1,14 @@
+// app.tsx
+
 "use client";
 
 import { useState } from "react";
 import { VerificationLevel, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
+import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 
-// Updated candidates with president and VP
 const PREDEFINED_CANDIDATES = [
   { 
     id: 1, 
@@ -42,6 +44,7 @@ export default function Home() {
   }
 
   const { setOpen } = useIDKit();
+  const router = useRouter(); // Initialize router
 
   // State management
   const [voteMethod, setVoteMethod] = useState<'select' | 'writeIn'>('select');
@@ -49,7 +52,6 @@ export default function Home() {
   const [writeInName, setWriteInName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleWriteInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWriteInName(e.target.value);
@@ -71,7 +73,6 @@ export default function Home() {
     try {
       setLoading(true);
       setError(null);
-      setSuccessMessage(null);
 
       const candidateName = voteMethod === 'writeIn' ? writeInName : selectedCandidate;
 
@@ -89,11 +90,13 @@ export default function Home() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setSuccessMessage("Your vote has been successfully recorded!");
+        // Redirect to /success page
+        router.push('/success');
       } else {
         setError(data.detail || "Failed to save your vote.");
       }
     } catch (err) {
+      console.error("Error during voting:", err);
       setError("An unexpected error occurred.");
     } finally {
       setLoading(false);
@@ -197,14 +200,7 @@ export default function Home() {
             {loading ? "Processing..." : "Verify with World ID"}
           </button>
 
-          {/* Messages */}
-          {successMessage && (
-            <div className="flex items-center gap-2 text-green-600 bg-green-50 p-4 rounded-lg">
-              <CheckCircle2 className="h-5 w-5" />
-              <p>{successMessage}</p>
-            </div>
-          )}
-
+          {/* Error Message */}
           {error && (
             <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-lg">
               <AlertCircle className="h-5 w-5" />
