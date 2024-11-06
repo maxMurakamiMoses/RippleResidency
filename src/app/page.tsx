@@ -72,7 +72,7 @@ export default function Home() {
   };
 
   const onSuccess = (result: ISuccessResult) => {
-    handleProof(result);
+    //nothing for now
   };
 
   const handleProof = async (result: ISuccessResult) => {
@@ -80,8 +80,7 @@ export default function Home() {
     if (data.success) {
       console.log("Successful response from backend:\n", JSON.stringify(data));
     } else {
-      // Optionally handle verification failure
-      // setError(`Verification failed: ${data.detail}`);
+      setError(`Verification failed: ${data.detail}`);
     }
 
     try {
