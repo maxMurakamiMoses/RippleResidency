@@ -47,7 +47,7 @@ export default function Home() {
           app_id={app_id}
           onSuccess={onSuccess}
           handleVerify={handleProof}
-          verification_level={VerificationLevel.Orb} // Change this to VerificationLevel.Device to accept Orb- and Device-verified users
+          verification_level={VerificationLevel.Device} // Change this to VerificationLevel.Device to accept Orb- and Device-verified users
         />
         <button
           className="border border-black rounded-md"
