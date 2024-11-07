@@ -12,7 +12,7 @@ interface PopupData {
   name: string;
   age: number;
   sex: string;
-  // Remove profilePic since we're using a generic icon
+  party: string;
 }
 
 interface Popup extends PopupData {
@@ -23,53 +23,68 @@ interface Popup extends PopupData {
 }
 
 const popupData: PopupData[] = [
-  {
-    name: 'Alisa Vitti',
-    age: 35,
-    sex: 'Female',
-  },
-  {
-    name: 'Bryan Johnson',
-    age: 40,
-    sex: 'Male',
-  },
-  {
-    name: 'Casey Means',
-    age: 28,
-    sex: 'Female',
-  },
-  {
-    name: 'David Sinclair',
-    age: 45,
-    sex: 'Male',
-  },
-  {
-    name: 'Peter Attia',
-    age: 50,
-    sex: 'Male',
-  },
-  {
-    name: 'Rhonda Patrick',
-    age: 38,
-    sex: 'Female',
-  },
-  {
-    name: 'Rich Roll',
-    age: 43,
-    sex: 'Male',
-  },
-  {
-    name: 'Tim Ferriss',
-    age: 48,
-    sex: 'Male',
-  },
-  {
-    name: 'Wim Hof',
-    age: 41,
-    sex: 'Male',
-  },
-  // Add more entries as needed
-];
+    {
+      name: 'Joe Biden',
+      age: 81,
+      sex: 'Male',
+      party: 'Democratic',
+    },
+    {
+      name: 'Kamala Harris',
+      age: 56,
+      sex: 'Female',
+      party: 'Democratic',
+    },
+    {
+      name: 'Donald Trump',
+      age: 78,
+      sex: 'Male',
+      party: 'Republican',
+    },
+    {
+      name: 'Ron DeSantis',
+      age: 45,
+      sex: 'Male',
+      party: 'Republican',
+    },
+    {
+      name: 'Nancy Pelosi',
+      age: 81,
+      sex: 'Female',
+      party: 'Democratic',
+    },
+    {
+      name: 'Mitch McConnell',
+      age: 80,
+      sex: 'Male',
+      party: 'Republican',
+    },
+    {
+      name: 'Elizabeth Warren',
+      age: 72,
+      sex: 'Female',
+      party: 'Democratic',
+    },
+    {
+      name: 'Ted Cruz',
+      age: 48,
+      sex: 'Male',
+      party: 'Republican',
+    },
+    {
+      name: 'Alexandria Ocasio-Cortez',
+      age: 33,
+      sex: 'Female',
+      party: 'Democratic',
+    },
+    {
+      name: 'Mitt Romney',
+      age: 74,
+      sex: 'Male',
+      party: 'Republican',
+    },
+    // Add more politician entries as needed
+  ];
 
 let popupId = 0; // Unique identifier for each popup
 
@@ -121,7 +136,7 @@ export function PeoplePopup() {
     const containerRect = container.getBoundingClientRect();
 
     const popupWidth = 250; // Increased width to accommodate text
-    const popupHeight = 180; // Adjusted height for the new layout
+    const popupHeight = 200; // Adjusted height for the new layout
 
     const top = Math.random() * (containerRect.height - popupHeight);
     const left = Math.random() * (containerRect.width - popupWidth);
@@ -133,6 +148,7 @@ export function PeoplePopup() {
       name: popupInfo.name,
       age: popupInfo.age,
       sex: popupInfo.sex,
+      party: popupInfo.party,
       isFadingOut: false,
     };
 
@@ -161,14 +177,15 @@ export function PeoplePopup() {
       {popups.map((popup) => (
         <div
           key={popup.id}
-          className={`absolute bg-white bg-opacity-90 border border-[#2A9D8F] rounded-xl flex flex-col p-4 shadow-lg pointer-events-auto ${
+          className={`absolute border border-[#2A9D8F] rounded-xl flex flex-col p-4 shadow-lg pointer-events-auto transition-colors duration-300 ${
             popup.isFadingOut ? 'animate-fadeOut' : 'animate-fadeIn'
-          }`}
+          } 
+          bg-gray-800 dark:bg-opacity-90`}
           style={{
             top: popup.top,
             left: popup.left,
-            width: '230px', // Increased width to accommodate content
-            zIndex: 40, // High z-index to ensure visibility
+            width: '230px',
+            zIndex: 40, 
           }}
         >
           {/* First Row: Generic Icon, Age, Sex */}
@@ -181,13 +198,18 @@ export function PeoplePopup() {
             {/* Text Container */}
             <div className="flex flex-col">
               {/* Name */}
-              <span className="text-lg font-semibold text-gray-800">
+              <span className="text-lg font-semibold text-gray-200">
                 {popup.name}
               </span>
 
               {/* Age and Sex */}
-              <span className="text-sm font-medium text-gray-600">
+              <span className="text-sm font-medium text-gray-400">
                 {popup.sex}, {popup.age} yrs
+              </span>
+
+              {/* Party */}
+              <span className="text-sm font-medium text-gray-400">
+                {popup.party}
               </span>
             </div>
           </div>

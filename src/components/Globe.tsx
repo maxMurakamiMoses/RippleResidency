@@ -398,7 +398,7 @@ export function Globe() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center bg-[#F0FDF4] w-full">
+    <div className="flex flex-col items-center justify-center bg-transparent  w-full">
       <div className="max-w-7xl mx-auto w-full relative overflow-hidden md:h-[30rem] px-4 min-w-[30rem] flex flex-col items-center justify-center">
         {/* Text Section */}
         <motion.div
@@ -423,7 +423,7 @@ export function Globe() {
           <World data={sampleArcs} globeConfig={globeConfig} />
         </div>
 
-        <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none from-transparent to-[#F0FDF4] z-40" />
+        <div className="absolute w-full bottom-0 inset-x-0 h-40 bg-gradient-to-b pointer-events-none select-none z-40" />
       </div>
     </div>
   );

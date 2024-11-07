@@ -10,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 import { verify } from "./actions/verify";
 import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
+import { Globe } from "@/components/Globe";
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -243,53 +244,54 @@ export default function Home() {
       return null;
     }
   };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       {/* Integrate MultiStep Loader */}
       <MultiStep loading={loading} />
 
       <div className="max-w-3xl mx-auto">
+        {/* Header Section */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-100 mb-2">
             Secure Voting Platform
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-400">
             Select your preferred candidates
           </p>
         </div>
+        <Globe />
 
         {/* Candidate Cards Grid */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
-            <Users className="h-6 w-6 text-blue-500" />
-            <h2 className="text-xl font-semibold text-gray-800">
+            <Users className="h-6 w-6 text-blue-400" />
+            <h2 className="text-xl font-semibold text-gray-100">
               Presidential Tickets
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {PREDEFINED_CANDIDATES.map((ticket) => (
-              <Card 
+              <Card
                 key={ticket.id}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
-                  selectedCandidate === ticket.president 
-                    ? 'ring-2 ring-blue-500 shadow-lg' 
-                    : 'hover:border-blue-200'
-                }`}
+                className={`cursor-pointer transition-all hover:shadow-2xl ${
+                  selectedCandidate === ticket.president
+                    ? 'ring-2 ring-blue-500 shadow-2xl' 
+                    : 'hover:border-blue-700'
+                } bg-gray-800 border border-gray-700`}
                 onClick={() => handleCandidateSelect(ticket.president)}
               >
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center justify-between">
-                    <span>{ticket.president}</span>
+                    <span className="text-gray-100">{ticket.president}</span>
                     {selectedCandidate === ticket.president && (
-                      <CheckCircle2 className="text-blue-500 h-5 w-5" />
+                      <CheckCircle2 className="text-blue-400 h-5 w-5" />
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">Vice President:</span>
-                    <span className="text-sm font-medium">{ticket.vicePresident}</span>
+                    <span className="text-sm text-gray-400">Vice President:</span>
+                    <span className="text-sm font-medium text-gray-200">{ticket.vicePresident}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -300,17 +302,17 @@ export default function Home() {
         {/* Write-in Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-100">
               Write-in Candidate
             </h2>
-            <UserPlus className="h-5 w-5 text-gray-500" />
+            <UserPlus className="h-5 w-5 text-gray-400" />
           </div>
           <div className="flex gap-4">
             <input
               type="text"
               value={writeInName}
               onChange={handleWriteInChange}
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter presidential candidate name..."
             />
           </div>
@@ -318,7 +320,7 @@ export default function Home() {
 
         {/* Wallet Address Input */}
         <div className="mb-8">
-          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300">
             Wallet Address (optional)
           </label>
           <input
@@ -326,7 +328,7 @@ export default function Home() {
             id="walletAddress"
             value={walletAddress}
             onChange={handleWalletAddressChange}
-            className="mt-1 block w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter XRP wallet address..."
           />
         </div>
@@ -345,7 +347,7 @@ export default function Home() {
             className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-white font-medium transition-colors ${
               isVoteValid && !loading
                 ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-gray-300 cursor-not-allowed'
+                : 'bg-gray-600 cursor-not-allowed'
             }`}
             onClick={() => setOpen(true)}
             disabled={!isVoteValid || loading}
@@ -360,7 +362,7 @@ export default function Home() {
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-red-400 bg-red-900 p-4 rounded-lg">
               <AlertCircle className="h-5 w-5" />
               <p>{error}</p>
             </div>
