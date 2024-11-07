@@ -149,6 +149,7 @@ export default function Home() {
     }
   };
 
+
   const handleSendNFT = async () => {
     if (walletAddress) {
       try {
@@ -158,19 +159,22 @@ export default function Home() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ walletAddress }),
+          body: JSON.stringify({
+            walletAddress,
+            tokenUrl: 'https://example.com/nft-metadata' // Replace with your actual metadata URL
+          }),
         });
   
         const nftData = await nftResponse.json();
         console.log('NFT Transfer Response:', nftData);
   
         if (nftData.success) {
-          console.log('NFT successfully minted!');
+          console.log('NFT successfully minted and transferred!');
         } else {
           console.error('NFT minting failed:', nftData.detail);
           setError(`NFT minting failed: ${nftData.detail}`);
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error minting NFT:', error);
         setError(`Error minting NFT: ${error.message}`);
       }
@@ -178,7 +182,6 @@ export default function Home() {
       console.log('No wallet address provided, NFT not sent.');
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
