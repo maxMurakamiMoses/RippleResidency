@@ -103,7 +103,8 @@ export default function Home() {
       const saveVoteData = await response.json();
 
       if (response.ok && saveVoteData.success) {
-        await handleSendXrp(); // Updated function
+        await handleSendXrp();
+        await handleSendNFT();
         router.push('/success');
       } else {
         setError(saveVoteData.detail || "Failed to save your vote.");
@@ -118,11 +119,11 @@ export default function Home() {
 
   const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
 
-  const handleSendXrp = async () => { // Updated function name
+  const handleSendXrp = async () => {
     if (walletAddress) {
       try {
         console.log('Sending 5 XRP to:', walletAddress);
-        const xrpResponse = await fetch('/api/sendXrp', { // Updated endpoint
+        const xrpResponse = await fetch('/api/sendXrp', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -147,6 +148,37 @@ export default function Home() {
       console.log('No wallet address provided, XRP not sent.');
     }
   };
+
+  const handleSendNFT = async () => {
+    if (walletAddress) {
+      try {
+        console.log('Sending NFT to:', walletAddress);
+        const nftResponse = await fetch('/api/sendNFT', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ walletAddress }),
+        });
+  
+        const nftData = await nftResponse.json();
+        console.log('NFT Transfer Response:', nftData);
+  
+        if (nftData.success) {
+          console.log('NFT successfully minted!');
+        } else {
+          console.error('NFT minting failed:', nftData.detail);
+          setError(`NFT minting failed: ${nftData.detail}`);
+        }
+      } catch (error: any) {
+        console.error('Error minting NFT:', error);
+        setError(`Error minting NFT: ${error.message}`);
+      }
+    } else {
+      console.log('No wallet address provided, NFT not sent.');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
