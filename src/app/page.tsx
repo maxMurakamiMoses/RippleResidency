@@ -1,14 +1,15 @@
-// app.tsx
+// File 2: app.tsx
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { useRouter } from 'next/navigation';
 import { VerificationLevel, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
-import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 import { verify } from "./actions/verify";
+import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -63,6 +64,12 @@ export default function Home() {
 
   const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWalletAddress(e.target.value);
+    // Optionally, you can trigger the loader here if you want it to appear immediately upon input
+    // For example:
+    // if (e.target.value) {
+    //   setLoading(true);
+    //   // Trigger any processing if needed
+    // }
   };
 
   const handleCandidateSelect = (presidentName: string) => {
@@ -72,11 +79,11 @@ export default function Home() {
   };
 
   const onSuccess = (result: ISuccessResult) => {
-    //nothing for now
+    // Handle success if needed
   };
 
   const handleProof = async (result: ISuccessResult) => {
-    // First, verify the World ID proof
+    // Verify the World ID proof
     const data = await verify(result);
     if (data.success) {
       console.log("Successful response from backend:\n", JSON.stringify(data));
@@ -165,6 +172,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
 
   const handleSendXrp = async () => {
@@ -197,7 +205,6 @@ export default function Home() {
     }
   };
 
-
   const handleSendNFT = async () => {
     if (walletAddress) {
       try {
@@ -226,7 +233,7 @@ export default function Home() {
         }
   
         return nftData; // Return the parsed data
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error minting NFT:', error);
         setError(`Error minting NFT: ${error.message}`);
         throw error; // Re-throw the error to be caught in handleProof
@@ -236,11 +243,12 @@ export default function Home() {
       return null;
     }
   };
-  
-  
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Integrate MultiStep Loader */}
+      <MultiStep loading={loading} />
+
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -308,6 +316,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Wallet Address Input */}
         <div className="mb-8">
           <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-700">
             Wallet Address (optional)
