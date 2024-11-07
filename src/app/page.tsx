@@ -11,6 +11,7 @@ import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "
 import { verify } from "./actions/verify";
 import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
 import { Globe } from "@/components/Globe";
+import { SubmitButton } from "@/components/SubmitButton";
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -369,6 +370,7 @@ export default function Home() {
           )}
         </div>
       </div>
+      <SubmitButton/>
     </div>
   );
 }
