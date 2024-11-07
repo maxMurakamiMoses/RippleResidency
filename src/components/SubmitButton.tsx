@@ -1,3 +1,5 @@
+// File 2: SubmitButton.tsx
+
 "use client";
 import { UserCheck, Loader2 } from "lucide-react";
 import React from "react";
@@ -5,12 +7,12 @@ import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
 export function SubmitButton({ onClick, disabled, loading }: any) {
   return (
-    <div className="flex justify-center text-center">
+    <div className="w-full">
       <HoverBorderGradient
-        containerClassName="rounded-full"
+        containerClassName="rounded-lg w-full"
         as="button"
-        className={`bg-black text-white flex items-center space-x-2 px-[190px] py-2${
-          disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-800"
+        className={`bg-black text-white flex items-center justify-center space-x-2 py-2${
+          disabled ? " opacity-50 cursor-not-allowed" : " "
         }`}
         onClick={onClick}
         disabled={disabled}

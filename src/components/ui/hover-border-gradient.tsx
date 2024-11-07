@@ -55,7 +55,7 @@ export function HoverBorderGradient({
       return () => clearInterval(interval);
     }
   }, [hovered, duration, clockwise]);
-
+  
   return (
     <Tag
       onMouseEnter={(event: React.MouseEvent<HTMLDivElement>) => {
@@ -63,14 +63,14 @@ export function HoverBorderGradient({
       }}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        "relative flex rounded-full border border-gray-700 content-center bg-gray-800/20 hover:bg-gray-800/10 transition duration-500 items-center flex-col flex-nowrap gap-2 h-min justify-center overflow-visible p-px decoration-clone w-fit",
-        containerClassName
+        "relative flex rounded-lg border border-gray-700 content-center bg-gray-800/20 hover:bg-gray-800/10 transition duration-500 items-center flex-col flex-nowrap gap-2 h-min justify-center overflow-visible p-px decoration-clone",
+        containerClassName // Removed "w-fit" from the default classes
       )}
       {...props}
     >
       <div
         className={cn(
-          "w-auto text-white z-10 bg-gray-800 px-4 py-2 rounded-full",
+          "w-full text-white z-10 bg-gray-800 px-4 py-2 rounded-lg", // Changed "w-auto" to "w-full"
           className
         )}
       >
@@ -78,7 +78,7 @@ export function HoverBorderGradient({
       </div>
       <motion.div
         className={cn(
-          "flex-none inset-0 overflow-hidden absolute z-0 rounded-full"
+          "flex-none inset-0 overflow-hidden absolute z-0 rounded-lg"
         )}
         style={{
           filter: "blur(2px)",
@@ -94,7 +94,7 @@ export function HoverBorderGradient({
         }}
         transition={{ ease: "linear", duration: duration ?? 1 }}
       />
-      <div className="bg-gray-800 absolute z-1 flex-none inset-[2px] rounded-full" />
+      <div className="bg-gray-800 absolute z-1 flex-none inset-[2px] rounded-lg" />
     </Tag>
   );
 }
