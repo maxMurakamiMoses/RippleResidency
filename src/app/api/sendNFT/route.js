@@ -25,6 +25,7 @@ export async function POST(request) {
 
     const wallet = Wallet.fromSeed(seed);
     const recipientWallet = Wallet.fromSeed(recipientSeed);
+    console.log('Here is the recipientWallet address: ', recipientWallet)
 
     // Step 1: Mint the NFT
     const mintTx = {
