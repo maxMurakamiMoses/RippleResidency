@@ -344,22 +344,12 @@ export default function Home() {
             verification_level={VerificationLevel.Device}
           />
 
-          <button
-            className={`w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-white font-medium transition-colors ${
-              isVoteValid && !loading
-                ? 'bg-blue-500 hover:bg-blue-600'
-                : 'bg-gray-600 cursor-not-allowed'
-            }`}
+          <SubmitButton
             onClick={() => setOpen(true)}
             disabled={!isVoteValid || loading}
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <UserCheck className="h-5 w-5" />
-            )}
-            {loading ? "Processing..." : "Verify with World ID"}
-          </button>
+            loading={loading}
+          />
+
 
           {/* Error Message */}
           {error && (
@@ -370,7 +360,6 @@ export default function Home() {
           )}
         </div>
       </div>
-      <SubmitButton/>
     </div>
   );
 }
