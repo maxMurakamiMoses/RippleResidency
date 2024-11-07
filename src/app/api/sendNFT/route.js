@@ -15,17 +15,14 @@ export async function POST(request) {
     }
 
     const seed = process.env.XRPL_SEED;
-    const recipientSeed = process.env.RECIPIENT_SEED; // Add recipient seed to .env for security
-    if (!seed || !recipientSeed) {
-      throw new Error('XRPL_SEED and RECIPIENT_SEED must be set in environment variables');
+    if (!seed) {
+      throw new Error('XRPL_SEED is not set in environment variables');
     }
 
     const client = new Client('wss://s.altnet.rippletest.net:51233');
     await client.connect();
 
     const wallet = Wallet.fromSeed(seed);
-    const recipientWallet = Wallet.fromSeed(recipientSeed);
-    console.log('Here is the recipientWallet address: ', recipientWallet)
 
     // Step 1: Mint the NFT
     const mintTx = {
@@ -69,6 +66,7 @@ export async function POST(request) {
     };
 
     const sellOfferResponse = await client.submitAndWait(sellOfferTx, { wallet });
+
     console.log("Sell offer response:", JSON.stringify(sellOfferResponse, null, 2));
 
     if (sellOfferResponse.result.meta.TransactionResult !== 'tesSUCCESS') {
@@ -87,32 +85,22 @@ export async function POST(request) {
 
     const sellOfferIndex = offerNode.CreatedNode.LedgerIndex;
 
-    // Step 3: Accept the sell offer to complete the transfer
-    const acceptOfferTx = {
-      TransactionType: 'NFTokenAcceptOffer',
-      Account: recipientWallet.classicAddress,
-      NFTokenSellOffer: sellOfferIndex,
-    };
-
-    const acceptOfferResponse = await client.submitAndWait(acceptOfferTx, { wallet: recipientWallet });
+    // Disconnect the client
     await client.disconnect();
 
-    if (acceptOfferResponse.result.meta.TransactionResult !== 'tesSUCCESS') {
-      throw new Error(`NFT transfer failed: ${acceptOfferResponse.result.meta.TransactionResult}`);
-    }
-
+    // Return the offer ID for the client to use to accept the offer
     return NextResponse.json({
       success: true,
-      detail: 'NFT minted and transferred successfully',
+      detail: 'NFT minted and offer created successfully',
       tokenID: tokenID,
-      txHash: acceptOfferResponse.result.hash
+      sellOfferIndex: sellOfferIndex
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Error during NFT minting and transfer:', error);
+    console.error('Error during NFT minting and offer creation:', error);
     return NextResponse.json({
       success: false,
-      detail: `NFT minting and transfer failed: ${error.message}`,
+      detail: `NFT minting and offer creation failed: ${error.message}`,
     }, { status: 500 });
   }
 }

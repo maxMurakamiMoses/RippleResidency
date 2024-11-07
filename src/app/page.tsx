@@ -76,19 +76,24 @@ export default function Home() {
   };
 
   const handleProof = async (result: ISuccessResult) => {
+    // First, verify the World ID proof
     const data = await verify(result);
     if (data.success) {
       console.log("Successful response from backend:\n", JSON.stringify(data));
     } else {
       setError(`Verification failed: ${data.detail}`);
+      return; // Exit if verification fails
     }
-
+  
     try {
+      // Start loading state and clear any previous errors
       setLoading(true);
       setError(null);
-
+  
+      // Get the selected candidate name based on vote method
       const candidateName = voteMethod === 'select' ? selectedCandidate : writeInName;
-
+  
+      // Save the vote to your database
       const response = await fetch("/api/saveVote", {
         method: "POST",
         headers: {
@@ -99,24 +104,67 @@ export default function Home() {
           nullifierHash: result.nullifier_hash,
         }),
       });
-
+  
       const saveVoteData = await response.json();
-
+  
       if (response.ok && saveVoteData.success) {
-        await handleSendXrp();
-        await handleSendNFT();
-        router.push('/success');
+        // If vote was saved successfully, process rewards if wallet address provided
+        
+        // 1. Send XRP
+        if (walletAddress) {
+          try {
+            await handleSendXrp();
+          } catch (err) {
+            console.error('Error sending XRP:', err);
+            // Continue even if XRP send fails
+          }
+        }
+  
+        // 2. Send NFT and get the response data
+        let nftData = null;
+        if (walletAddress) {
+          try {
+            nftData = await handleSendNFT();
+          } catch (err) {
+            console.error('Error sending NFT:', err);
+          }
+        }
+        
+  
+        // 3. Build the success URL with parameters
+        const successParams = new URLSearchParams();
+        
+        if (walletAddress) {
+          // Add wallet address to URL params
+          successParams.append('walletAddress', walletAddress);
+        
+          // Add sell offer index if NFT was successfully created
+          if (nftData?.sellOfferIndex) {
+            successParams.append('sellOfferIndex', nftData.sellOfferIndex);
+          }
+        }
+        
+        console.log('This is your nftData: ', nftData);
+        
+  
+        // 4. Redirect to success page with parameters
+        router.push(`/success?${successParams.toString()}`);
+        
       } else {
+        // If vote saving failed, show error
         setError(saveVoteData.detail || "Failed to save your vote.");
       }
+  
     } catch (err) {
+      // Handle any unexpected errors
       console.error("Error during voting:", err);
       setError("An unexpected error occurred.");
+      
     } finally {
+      // Always turn off loading state
       setLoading(false);
     }
   };
-
   const isVoteValid = voteMethod === 'select' ? selectedCandidate !== '' : writeInName.trim() !== '';
 
   const handleSendXrp = async () => {
@@ -165,7 +213,9 @@ export default function Home() {
           }),
         });
   
+        // Parse the response to get nftData
         const nftData = await nftResponse.json();
+  
         console.log('NFT Transfer Response:', nftData);
   
         if (nftData.success) {
@@ -174,14 +224,20 @@ export default function Home() {
           console.error('NFT minting failed:', nftData.detail);
           setError(`NFT minting failed: ${nftData.detail}`);
         }
+  
+        return nftData; // Return the parsed data
       } catch (error) {
         console.error('Error minting NFT:', error);
         setError(`Error minting NFT: ${error.message}`);
+        throw error; // Re-throw the error to be caught in handleProof
       }
     } else {
       console.log('No wallet address provided, NFT not sent.');
+      return null;
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
