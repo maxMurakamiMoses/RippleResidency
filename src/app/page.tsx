@@ -10,8 +10,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 import { verify } from "./actions/verify";
 import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
-import { Globe } from "@/components/Globe";
 import { SubmitButton } from "@/components/SubmitButton";
+import IntroSection from "@/components/hero/IntroSection";
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -246,22 +246,13 @@ export default function Home() {
     }
   };
   return (
+    <>
+    <IntroSection />
     <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       {/* Integrate MultiStep Loader */}
       <MultiStep loading={loading} />
 
       <div className="max-w-3xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-100 mb-2">
-            Secure Voting Platform
-          </h1>
-          <p className="text-lg text-gray-400">
-            Select your preferred candidates
-          </p>
-        </div>
-        <Globe />
-
         {/* Candidate Cards Grid */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-4">
@@ -361,5 +352,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </>
   );
 }

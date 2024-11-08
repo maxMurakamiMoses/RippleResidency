@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { PeoplePopup } from "./PeoplePopup";
 
 
-const World = dynamic(() => import("./ui/globe").then((m) => m.World), {
+const World = dynamic(() => import("../ui/globe").then((m) => m.World), {
   ssr: false,
 });
 
@@ -398,8 +398,8 @@ export function Globe() {
 
 
   return (
-    <div className="flex flex-col items-center justify-center bg-transparent  w-full">
-      <div className="max-w-7xl mx-auto w-full relative overflow-hidden md:h-[30rem] px-4 min-w-[30rem] flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center bg-transparent  w-full pb-20">
+      <div className="max-w-7xl mx-auto w-full relative overflow-visible md:h-[30rem] px-4 min-w-[30rem] flex flex-col items-center justify-center">
         {/* Text Section */}
         <motion.div
           initial={{

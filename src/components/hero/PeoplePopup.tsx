@@ -185,15 +185,15 @@ export function PeoplePopup() {
             top: popup.top,
             left: popup.left,
             width: '230px',
-            zIndex: 40, 
+            zIndex: 20, 
           }}
         >
           {/* First Row: Generic Icon, Age, Sex */}
           <div className="flex flex-row items-center">
             {/* Generic Icon */}
-            <div className="relative w-16 h-16 text-gray-400 mr-4">
+            {/* <div className="relative w-16 h-16 text-gray-400 mr-4">
               <FaUserCircle size={64} />
-            </div>
+            </div> */}
 
             {/* Text Container */}
             <div className="flex flex-col">
