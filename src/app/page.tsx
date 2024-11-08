@@ -12,6 +12,7 @@ import { verify } from "./actions/verify";
 import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
 import { SubmitButton } from "@/components/SubmitButton";
 import IntroSection from "@/components/hero/IntroSection";
+import { Separator } from "@/components/ui/separator"
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -248,6 +249,9 @@ export default function Home() {
   return (
     <>
     <IntroSection />
+    <div className='py-20 px-10 bg-gray-900'>
+    <Separator />
+    </div>
     <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       {/* Integrate MultiStep Loader */}
       <MultiStep loading={loading} />

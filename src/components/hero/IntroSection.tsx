@@ -1,5 +1,3 @@
-// File: IntroSection.tsx
-
 "use client";
 
 import React from "react";
@@ -21,15 +19,15 @@ const IntroSection = () => {
       </div>
 
       {/* Content Section: TextReveal and Globe */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+      <div className="flex flex-col md:flex-row items-start gap-8">
         {/* TextReveal Column (2/3 width on medium and above screens) */}
-        <div className="w-full md:w-2/3 pl-20">
+        <div className="w-full md:w-1/2 pl-20">
           <TextReveal />
           <PartySection />
         </div>
 
         {/* Globe Column (1/3 width on medium and above screens) */}
-        <div className="w-full md:w-1/3 flex justify-center overflow-visible">
+        <div className="w-full md:w-1/2 flex justify-center items-center h-full sticky top-1/2">
           <Globe />
         </div>
       </div>

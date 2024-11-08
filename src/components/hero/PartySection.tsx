@@ -27,7 +27,8 @@ export function PartySection() {
   useOutsideClick(ref, () => setActive(null));
 
   return (
-    <>
+    <div className="max-w-2xl">
+      <h1 className="text-4xl font-bold text-gray-100 mb-4">Learn About the Parties Running</h1>
       <AnimatePresence>
         {active && typeof active === "object" && (
           <motion.div
@@ -110,7 +111,7 @@ export function PartySection() {
           </div>
         ) : null}
       </AnimatePresence>
-      <ul className="max-w-2xl mx-auto w-full gap-4">
+      <ul className="w-full gap-4">
         {cards.map((card) => (
           <motion.div
             layoutId={`card-${card.title}-${id}`}
@@ -148,7 +149,7 @@ export function PartySection() {
           </motion.div>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 
@@ -178,7 +179,6 @@ export const CloseIcon = () => {
     </motion.svg>
   );
 };
-
 const cards = [
   {
     description: "The Democratic Party",

@@ -16,7 +16,7 @@ export function TextReveal({
   description = `The presidential election is underway. Citizens are making their voices heard, choosing leaders who will shape our future. Every vote counts in this pivotal moment. Democracy in action, forging the path forward. Make your vote matter and influence the course of our nation.`
 }: TextRevealProps) {
   return (
-    <Card className="bg-gray-800/50 border-gray-700">
+    <Card className="bg-gray-800/50 border-gray-700 mb-20">
       <CardHeader>
         <CardTitle className="text-4xl font-bold text-gray-100">
           About this election
