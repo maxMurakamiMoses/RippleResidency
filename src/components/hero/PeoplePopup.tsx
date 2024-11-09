@@ -1,6 +1,9 @@
+// PeoplePopup.tsx
+
 import { useState, useEffect, useRef } from 'react';
 import { Roboto_Mono } from 'next/font/google';
-import { FaUserCircle } from 'react-icons/fa'; // Importing a generic user icon
+import { FaUserCircle } from 'react-icons/fa';
+import { PREDEFINED_CANDIDATES, Candidate, Politician } from '@/data/candidates'; // Adjust the path as necessary
 
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
@@ -8,83 +11,13 @@ const robotoMono = Roboto_Mono({
   variable: '--font-roboto-mono',
 });
 
-interface PopupData {
-  name: string;
-  age: number;
-  sex: string;
-  party: string;
-}
-
-interface Popup extends PopupData {
+// Extend Candidate interface for Popup
+interface Popup extends Politician {
   id: number;
   top: number;
   left: number;
   isFadingOut: boolean;
 }
-
-const popupData: PopupData[] = [
-    {
-      name: 'Joe Biden',
-      age: 81,
-      sex: 'Male',
-      party: 'Democratic',
-    },
-    {
-      name: 'Kamala Harris',
-      age: 56,
-      sex: 'Female',
-      party: 'Democratic',
-    },
-    {
-      name: 'Donald Trump',
-      age: 78,
-      sex: 'Male',
-      party: 'Republican',
-    },
-    {
-      name: 'Ron DeSantis',
-      age: 45,
-      sex: 'Male',
-      party: 'Republican',
-    },
-    {
-      name: 'Nancy Pelosi',
-      age: 81,
-      sex: 'Female',
-      party: 'Democratic',
-    },
-    {
-      name: 'Mitch McConnell',
-      age: 80,
-      sex: 'Male',
-      party: 'Republican',
-    },
-    {
-      name: 'Elizabeth Warren',
-      age: 72,
-      sex: 'Female',
-      party: 'Democratic',
-    },
-    {
-      name: 'Ted Cruz',
-      age: 48,
-      sex: 'Male',
-      party: 'Republican',
-    },
-    {
-      name: 'Alexandria Ocasio-Cortez',
-      age: 33,
-      sex: 'Female',
-      party: 'Democratic',
-    },
-    {
-      name: 'Mitt Romney',
-      age: 74,
-      sex: 'Male',
-      party: 'Republican',
-    },
-    // Add more politician entries as needed
-  ];
 
 let popupId = 0; // Unique identifier for each popup
 
@@ -95,6 +28,12 @@ export function PeoplePopup() {
   const initialPopupTimeout = useRef<number | null>(null);
   const popupInterval = useRef<number | null>(null);
   const currentPopupIndex = useRef(0);
+
+  // Extract individual politicians from candidates
+  const politicians: Politician[] = PREDEFINED_CANDIDATES.flatMap(ticket => [
+    ticket.president,
+    ticket.vicePresident,
+  ]);
 
   useEffect(() => {
     const scheduleInitialPopup = () => {
@@ -126,11 +65,11 @@ export function PeoplePopup() {
     const container = containerRef.current;
     if (!container) return;
 
-    if (currentPopupIndex.current >= popupData.length) {
+    if (currentPopupIndex.current >= politicians.length) {
       currentPopupIndex.current = 0; // Reset to start if we've shown all popups
     }
 
-    const popupInfo = popupData[currentPopupIndex.current];
+    const politician = politicians[currentPopupIndex.current];
     currentPopupIndex.current++;
 
     const containerRect = container.getBoundingClientRect();
@@ -145,10 +84,10 @@ export function PeoplePopup() {
       id: popupId++,
       top,
       left,
-      name: popupInfo.name,
-      age: popupInfo.age,
-      sex: popupInfo.sex,
-      party: popupInfo.party,
+      name: politician.name,
+      age: politician.age,
+      sex: politician.sex,
+      party: politician.party,
       isFadingOut: false,
     };
 
@@ -188,13 +127,14 @@ export function PeoplePopup() {
             zIndex: 20, 
           }}
         >
-          {/* First Row: Generic Icon, Age, Sex */}
-          <div className="flex flex-row items-center">
-            {/* Generic Icon */}
-            {/* <div className="relative w-16 h-16 text-gray-400 mr-4">
+          {/* First Row: Optional Generic Icon */}
+          <div className="flex flex-row items-center mb-2">
+            {/* Uncomment the following block to display the generic user icon */}
+            {/*
+            <div className="relative w-16 h-16 text-gray-400 mr-4">
               <FaUserCircle size={64} />
-            </div> */}
-
+            </div>
+            */}
             {/* Text Container */}
             <div className="flex flex-col">
               {/* Name */}
@@ -219,7 +159,7 @@ export function PeoplePopup() {
         </div>
       ))}
 
-      {/* Tailwind CSS Animation */}
+      {/* Tailwind CSS Animations */}
       <style jsx>{`
         @keyframes fadeIn {
           from {

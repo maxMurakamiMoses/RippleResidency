@@ -1,4 +1,4 @@
-// File 2: app.tsx
+// app.tsx
 
 "use client";
 
@@ -15,28 +15,8 @@ import { SubmitButton } from "@/components/SubmitButton";
 import IntroSection from "@/components/hero/IntroSection";
 import { Separator } from "@/components/ui/separator";
 
-const PREDEFINED_CANDIDATES = [
-  { 
-    id: 1, 
-    president: "John Smith",
-    vicePresident: "Sarah Parker"
-  },
-  { 
-    id: 2, 
-    president: "Jane Doe",
-    vicePresident: "Michael Chen"
-  },
-  { 
-    id: 3, 
-    president: "Alice Johnson",
-    vicePresident: "David Rodriguez"
-  },
-  { 
-    id: 4, 
-    president: "Bob Wilson",
-    vicePresident: "Maria Garcia"
-  },
-];
+// Import the updated candidates
+import { PREDEFINED_CANDIDATES, Candidate } from "@/data/candidates";
 
 export default function Home() {
   const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
@@ -272,20 +252,20 @@ export default function Home() {
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PREDEFINED_CANDIDATES.map((ticket) => (
+              {PREDEFINED_CANDIDATES.map((ticket: Candidate) => (
                 <Card
                   key={ticket.id}
                   className={`cursor-pointer transition-all hover:shadow-2xl ${
-                    selectedCandidate === ticket.president
+                    selectedCandidate === ticket.president.name
                       ? 'ring-2 ring-blue-500 shadow-2xl' 
                       : 'hover:border-blue-700'
                   } bg-gray-800 border border-gray-700`}
-                  onClick={() => handleCandidateSelect(ticket.president)}
+                  onClick={() => handleCandidateSelect(ticket.president.name)}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center justify-between">
-                      <span className="text-gray-100">{ticket.president}</span>
-                      {selectedCandidate === ticket.president && (
+                      <span className="text-gray-100">{ticket.president.name}</span>
+                      {selectedCandidate === ticket.president.name && (
                         <CheckCircle2 className="text-blue-400 h-5 w-5" />
                       )}
                     </CardTitle>
@@ -293,8 +273,13 @@ export default function Home() {
                   <CardContent>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-400">Vice President:</span>
-                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident}</span>
+                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident.name}</span>
                     </div>
+                    {/* Optionally, display additional details about the vice president */}
+                    {/* <div className="flex items-center gap-2 mt-2">
+                      <span className="text-sm text-gray-400">Party:</span>
+                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident.party}</span>
+                    </div> */}
                   </CardContent>
                 </Card>
               ))}
