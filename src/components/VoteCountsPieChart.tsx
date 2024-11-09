@@ -1,22 +1,12 @@
-// src/components/VoteCountsChart.tsx
+// src/components/VoteCountsPieChart.tsx
 
 "use client";
 
 import React from "react";
-import { TrendingUp } from "lucide-react";
 import { Pie, PieChart, Tooltip, ResponsiveContainer } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
@@ -67,32 +57,34 @@ export const VoteCountsPieChart: React.FC<VoteCountsChartProps> = ({
   const trendingPercentage = 5.2; // Replace with dynamic calculation if needed
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Vote Counts</CardTitle>
-        <CardDescription>Current Vote Distribution</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Tooltip content={<ChartTooltipContent hideLabel />} />
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                label
-                outerRadius="80%"
-                innerRadius="40%"
-                paddingAngle={5}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <div className="w-full max-w-md mx-auto p-4 rounded-lg shadow-md">
+      {/* Optional Header */}
+      {/* If you still want to include a title or description, you can add them here */}
+      {/* 
+      <div className="mb-4 text-center">
+        <h2 className="text-xl font-semibold text-gray-100">Vote Counts</h2>
+        <p className="text-gray-400">Current Vote Distribution</p>
+      </div>
+      */}
+      <ChartContainer
+        config={chartConfig}
+        className="relative mx-auto aspect-square max-h-[250px] [&_.recharts-pie-label-text]:fill-white"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Tooltip content={<ChartTooltipContent hideLabel />} />
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              label
+              outerRadius="80%"
+              innerRadius="40%"
+              paddingAngle={5}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </ChartContainer>
+    </div>
   );
 };

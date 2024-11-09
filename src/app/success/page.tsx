@@ -9,7 +9,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { CheckCircle2, Users, Gift } from "lucide-react";
-import { VoteCountsPieChart } from "@/components/VoteCountsPieChart"; // Import the new component
+import Results from "@/components/Results";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,15 @@ interface SuccessPageProps {
   };
 }
 
-async function getVoteCounts() {
+// Define an interface for vote counts
+interface VoteCount {
+  candidateName: string;
+  _count: {
+    candidateName: number;
+  };
+}
+
+async function getVoteCounts(): Promise<VoteCount[]> {
   const votes = await prisma.vote.groupBy({
     by: ["candidateName"],
     _count: {
@@ -42,18 +50,12 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   const sellOfferIndex = searchParams.sellOfferIndex;
   const walletAddress = searchParams.walletAddress;
 
+  // Extract top 3 candidates
+  const topThree = voteCounts.slice(0, 3);
+
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
-          <h1 className="text-3xl font-bold text-gray-100 mt-4">
-            Thank You for Voting!
-          </h1>
-          <p className="text-lg text-gray-300">
-            Here are the current vote counts for each candidate.
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto">
 
         {/* NFT Transfer Details */}
         {walletAddress && (
@@ -87,14 +89,34 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
             </CardContent>
           </Card>
         )}
-
-        {/* Vote Counts Chart */}
-        <div className="mb-8">
-          <VoteCountsPieChart voteCounts={voteCounts} />
+        <div className="mb-8 flex flex-col items-start sm:flex-row sm:justify-start sm:space-x-4">
+          <CheckCircle2 className="h-12 w-12 text-green-500" />
+          <div className="mt-4 sm:mt-0">
+            <h1 className="text-3xl font-bold text-gray-100">
+              Election Results
+            </h1>
+            <p className="text-lg text-gray-300">
+              Here are the TLDR election results.
+            </p>
+          </div>
         </div>
 
+        {/* Vote Counts Chart and Podium */}
+        <Results />
+
+        <div className="mb-8 flex flex-col items-start sm:flex-row sm:justify-start sm:space-x-4">
+          <CheckCircle2 className="h-12 w-12 text-green-500" />
+          <div className="mt-4 sm:mt-0">
+            <h1 className="text-3xl font-bold text-gray-100">
+              Election Results
+            </h1>
+            <p className="text-lg text-gray-300">
+              Here are the detailed election results.
+            </p>
+          </div>
+        </div>
         {/* Vote Counts Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {voteCounts.map((vote) => (
             <Card key={vote.candidateName} className="shadow-md bg-gray-800">
               <CardHeader>
