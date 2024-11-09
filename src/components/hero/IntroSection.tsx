@@ -7,7 +7,7 @@ import { PartySection } from "./PartySection";
 
 const IntroSection = () => {
   return (
-    <div className="min-h-screen bg-gray-900 py-12 dark">
+    <div className="min-h-screen bg-gray-900 py-12 dark px-20">
       {/* Header Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-100 mb-4">
@@ -18,17 +18,24 @@ const IntroSection = () => {
         </p>
       </div>
 
-      {/* Content Section: TextReveal and Globe */}
-      <div className="flex flex-col md:flex-row items-start gap-8">
-        {/* TextReveal Column (2/3 width on medium and above screens) */}
-        <div className="w-full md:w-1/2 pl-20">
+      {/* Content Section */}
+      <div className="flex flex-col gap-8">
+        {/* TextReveal Row */}
+        <div className="w-full">
           <TextReveal />
-          <PartySection />
         </div>
 
-        {/* Globe Column (1/3 width on medium and above screens) */}
-        <div className="w-full md:w-1/2 flex justify-center items-center h-full sticky top-1/2">
-          <Globe />
+        {/* PartySection and Globe Row */}
+        <div className="flex flex-col md:flex-row items-start gap-8 w-full">
+          {/* PartySection Column */}
+          <div className="w-full md:w-1/2">
+            <PartySection />
+          </div>
+
+          {/* Globe Column */}
+          <div className="w-full md:w-1/2 flex justify-center items-center h-full">
+            <Globe />
+          </div>
         </div>
       </div>
     </div>

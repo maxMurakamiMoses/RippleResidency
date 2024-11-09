@@ -10,9 +10,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 import { verify } from "../actions/verify";
 import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
+import { MultiStepTwo } from "@/components/MultiStepTwo"; // Adjust the path accordingly
 import { SubmitButton } from "@/components/SubmitButton";
 import IntroSection from "@/components/hero/IntroSection";
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/separator";
 
 const PREDEFINED_CANDIDATES = [
   { 
@@ -246,116 +247,120 @@ export default function Home() {
       return null;
     }
   };
+
   return (
     <>
-    <IntroSection />
-    <div className='py-20 px-10 bg-gray-900'>
-    <Separator />
-    </div>
-    <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Integrate MultiStep Loader */}
-      <MultiStep loading={loading} />
+      <IntroSection />
+      <div className='py-20 px-10 bg-gray-900'>
+        <Separator />
+      </div>
+      <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        {/* Conditional Rendering of MultiStep Components */}
+        {walletAddress ? (
+          <MultiStep loading={loading} />
+        ) : (
+          <MultiStepTwo loading={loading} />
+        )}
 
-      <div className="max-w-3xl mx-auto">
-        {/* Candidate Cards Grid */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="h-6 w-6 text-blue-400" />
-            <h2 className="text-xl font-semibold text-gray-100">
-              Presidential Tickets
-            </h2>
+        <div className="max-w-3xl mx-auto">
+          {/* Candidate Cards Grid */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="h-6 w-6 text-blue-400" />
+              <h2 className="text-xl font-semibold text-gray-100">
+                Presidential Tickets
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {PREDEFINED_CANDIDATES.map((ticket) => (
+                <Card
+                  key={ticket.id}
+                  className={`cursor-pointer transition-all hover:shadow-2xl ${
+                    selectedCandidate === ticket.president
+                      ? 'ring-2 ring-blue-500 shadow-2xl' 
+                      : 'hover:border-blue-700'
+                  } bg-gray-800 border border-gray-700`}
+                  onClick={() => handleCandidateSelect(ticket.president)}
+                >
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center justify-between">
+                      <span className="text-gray-100">{ticket.president}</span>
+                      {selectedCandidate === ticket.president && (
+                        <CheckCircle2 className="text-blue-400 h-5 w-5" />
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-400">Vice President:</span>
+                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PREDEFINED_CANDIDATES.map((ticket) => (
-              <Card
-                key={ticket.id}
-                className={`cursor-pointer transition-all hover:shadow-2xl ${
-                  selectedCandidate === ticket.president
-                    ? 'ring-2 ring-blue-500 shadow-2xl' 
-                    : 'hover:border-blue-700'
-                } bg-gray-800 border border-gray-700`}
-                onClick={() => handleCandidateSelect(ticket.president)}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="text-gray-100">{ticket.president}</span>
-                    {selectedCandidate === ticket.president && (
-                      <CheckCircle2 className="text-blue-400 h-5 w-5" />
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">Vice President:</span>
-                    <span className="text-sm font-medium text-gray-200">{ticket.vicePresident}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
 
-        {/* Write-in Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-100">
-              Write-in Candidate
-            </h2>
-            <UserPlus className="h-5 w-5 text-gray-400" />
+          {/* Write-in Section */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-100">
+                Write-in Candidate
+              </h2>
+              <UserPlus className="h-5 w-5 text-gray-400" />
+            </div>
+            <div className="flex gap-4">
+              <input
+                type="text"
+                value={writeInName}
+                onChange={handleWriteInChange}
+                className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter presidential candidate name..."
+              />
+            </div>
           </div>
-          <div className="flex gap-4">
+
+          {/* Wallet Address Input */}
+          <div className="mb-8">
+            <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300">
+              Wallet Address (optional)
+            </label>
             <input
               type="text"
-              value={writeInName}
-              onChange={handleWriteInChange}
-              className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter presidential candidate name..."
+              id="walletAddress"
+              value={walletAddress}
+              onChange={handleWalletAddressChange}
+              className="mt-1 block w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter XRP wallet address..."
             />
           </div>
-        </div>
 
-        {/* Wallet Address Input */}
-        <div className="mb-8">
-          <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300">
-            Wallet Address (optional)
-          </label>
-          <input
-            type="text"
-            id="walletAddress"
-            value={walletAddress}
-            onChange={handleWalletAddressChange}
-            className="mt-1 block w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter XRP wallet address..."
-          />
-        </div>
+          {/* Verification Section */}
+          <div className="space-y-4">
+            <IDKitWidget
+              action={action}
+              app_id={app_id}
+              onSuccess={onSuccess}
+              handleVerify={handleProof}
+              verification_level={VerificationLevel.Device}
+            />
 
-        {/* Verification Section */}
-        <div className="space-y-4">
-          <IDKitWidget
-            action={action}
-            app_id={app_id}
-            onSuccess={onSuccess}
-            handleVerify={handleProof}
-            verification_level={VerificationLevel.Device}
-          />
+            <SubmitButton
+              onClick={() => setOpen(true)}
+              disabled={!isVoteValid || loading}
+              loading={loading}
+            />
 
-          <SubmitButton
-            onClick={() => setOpen(true)}
-            disabled={!isVoteValid || loading}
-            loading={loading}
-          />
-
-
-          {/* Error Message */}
-          {error && (
-            <div className="flex items-center gap-2 text-red-400 bg-red-900 p-4 rounded-lg">
-              <AlertCircle className="h-5 w-5" />
-              <p>{error}</p>
-            </div>
-          )}
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center gap-2 text-red-400 bg-red-900 p-4 rounded-lg">
+                <AlertCircle className="h-5 w-5" />
+                <p>{error}</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

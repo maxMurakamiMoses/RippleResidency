@@ -28,7 +28,7 @@ export function TextReveal({
           {title}
           <TextGenerateEffect 
             words={description}
-            className="text-gray-300 leading-relaxed"
+            className="text-gray-500 leading-relaxed"
           />
         </div>
       </CardContent>
