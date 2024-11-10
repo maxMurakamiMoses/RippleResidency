@@ -57,7 +57,7 @@ export const VoteCountsPieChart: React.FC<VoteCountsChartProps> = ({
   const trendingPercentage = 5.2; // Replace with dynamic calculation if needed
 
   return (
-    <div className="w-full max-w-md mx-auto p-4 rounded-lg shadow-md">
+    <div className="w-full max-w-md mx-auto p-4 rounded-lg">
       {/* Optional Header */}
       {/* If you still want to include a title or description, you can add them here */}
       {/* 

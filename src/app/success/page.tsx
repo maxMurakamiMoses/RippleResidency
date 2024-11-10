@@ -9,8 +9,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { CheckCircle2, Users, Gift } from "lucide-react";
-import Results from "@/components/Results";
-import LedgerVoteResults from "@/components/LedgerVoteResults";
+import DBVoteResults from "@/components/sucess/DBVoteResults";
+import LedgerVoteResults from "@/components/sucess/LedgerVoteResults";
 
 const prisma = new PrismaClient();
 
@@ -103,7 +103,7 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
         </div>
 
         {/* Vote Counts Chart and Podium */}
-        <Results />
+        <DBVoteResults />
         <LedgerVoteResults />
 
         <div className="mb-8 flex flex-col items-start sm:flex-row sm:justify-start sm:space-x-4">

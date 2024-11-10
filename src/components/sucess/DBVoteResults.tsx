@@ -8,8 +8,8 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
-import { VoteCountsPieChart } from "@/components/VoteCountsPieChart";
-import Podium from "@/components/Podium";
+import { VoteCountsPieChart } from "@/components/sucess/VoteCountsPieChart";
+import Podium from "@/components/sucess/Podium";
 
 // Define interface for vote counts
 interface VoteCount {
@@ -38,7 +38,7 @@ async function getVoteCounts(): Promise<VoteCount[]> {
   return votes;
 }
 
-const ResultsPage = async () => {
+const DBVoteResults = async () => {
   // Fetch vote counts
   const voteCounts = await getVoteCounts();
 
@@ -53,10 +53,10 @@ const ResultsPage = async () => {
         <Card className="bg-gray-800 p-6 shadow-lg">
           <CardHeader className="flex justify-between items-center">
             <CardTitle className="text-2xl font-semibold text-gray-100">
-              Vote Distribution & Top Candidates
+              Voting Reslts
             </CardTitle>
             <span className="text-sm text-gray-400">
-              This data was pulled from a centralized DB
+              This data was pulled from a centralized DB.
             </span>
           </CardHeader>
           <CardContent>
@@ -79,4 +79,4 @@ const ResultsPage = async () => {
   );
 };
 
-export default ResultsPage;
+export default DBVoteResults;
