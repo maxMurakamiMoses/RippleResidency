@@ -64,7 +64,6 @@ export const partyData: PartyData[] = [
     content: "Independent voters and candidates are not affiliated with any political party. This growing segment of American politics represents voters who prefer to evaluate issues and candidates on their individual merits rather than party loyalty.\n\nIndependent voters often play a crucial role in elections, particularly in swing states. Notable independent politicians have included Bernie Sanders (who caucuses with Democrats) and Angus King. The movement advocates for reduced partisanship and electoral reforms."
   },
 ];
-
 export const PREDEFINED_CANDIDATES: Candidate[] = [
   { 
     id: 1, 
@@ -72,13 +71,13 @@ export const PREDEFINED_CANDIDATES: Candidate[] = [
       name: "John Smith", 
       age: 55, 
       sex: "Male", 
-      party: "Independent" 
+      party: "Independents" 
     },
     vicePresident: { 
       name: "Sarah Parker", 
       age: 50, 
       sex: "Female", 
-      party: "Independent" 
+      party: "Independents" 
     },
   },
   { 
@@ -87,13 +86,13 @@ export const PREDEFINED_CANDIDATES: Candidate[] = [
       name: "Jane Doe", 
       age: 48, 
       sex: "Female", 
-      party: "Democratic" 
+      party: "Democrats" 
     },
     vicePresident: { 
       name: "Michael Chen", 
       age: 52, 
       sex: "Male", 
-      party: "Democratic" 
+      party: "Democrats" 
     },
   },
   { 
@@ -102,13 +101,13 @@ export const PREDEFINED_CANDIDATES: Candidate[] = [
       name: "Alice Johnson", 
       age: 60, 
       sex: "Female", 
-      party: "Republican" 
+      party: "Republicans" 
     },
     vicePresident: { 
       name: "David Rodriguez", 
       age: 58, 
       sex: "Male", 
-      party: "Republican" 
+      party: "Republicans" 
     },
   },
   { 
@@ -117,13 +116,13 @@ export const PREDEFINED_CANDIDATES: Candidate[] = [
       name: "Bob Wilson", 
       age: 62, 
       sex: "Male", 
-      party: "Green" 
+      party: "Green Party" 
     },
     vicePresident: { 
       name: "Maria Garcia", 
       age: 54, 
       sex: "Female", 
-      party: "Green" 
+      party: "Green Party" 
     },
   },
   { 
@@ -132,60 +131,15 @@ export const PREDEFINED_CANDIDATES: Candidate[] = [
       name: "Emily Davis", 
       age: 49, 
       sex: "Female", 
-      party: "Libertarian" 
+      party: "Libertarians" 
     },
     vicePresident: { 
       name: "James Thompson", 
       age: 53, 
       sex: "Male", 
-      party: "Libertarian" 
+      party: "Libertarians" 
     },
-  },
-  { 
-    id: 6, 
-    president: { 
-      name: "Carlos Martinez", 
-      age: 57, 
-      sex: "Male", 
-      party: "Socialist" 
-    },
-    vicePresident: { 
-      name: "Linda Nguyen", 
-      age: 51, 
-      sex: "Female", 
-      party: "Socialist" 
-    },
-  },
-  { 
-    id: 7, 
-    president: { 
-      name: "Sophia Lee", 
-      age: 46, 
-      sex: "Female", 
-      party: "Progressive" 
-    },
-    vicePresident: { 
-      name: "Ethan Brown", 
-      age: 49, 
-      sex: "Male", 
-      party: "Progressive" 
-    },
-  },
-  { 
-    id: 8, 
-    president: { 
-      name: "William Harris", 
-      age: 61, 
-      sex: "Male", 
-      party: "Constitution" 
-    },
-    vicePresident: { 
-      name: "Olivia Clark", 
-      age: 47, 
-      sex: "Female", 
-      party: "Constitution" 
-    },
-  },
+  }
 ];
 
 export const electionInfo = {
