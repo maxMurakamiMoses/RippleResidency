@@ -2,21 +2,18 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { VerificationLevel, IDKitWidget, useIDKit } from "@worldcoin/idkit";
 import type { ISuccessResult } from "@worldcoin/idkit";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UserCheck, UserPlus, AlertCircle, CheckCircle2, Loader2, Users } from "lucide-react";
 import { verify } from "../actions/verify";
-import { MultiStep } from "@/components/MultiStep"; // Adjust the path accordingly
-import { MultiStepTwo } from "@/components/MultiStepTwo"; // Adjust the path accordingly
+import { MultiStep } from "@/components/MultiStep";
+import { MultiStepTwo } from "@/components/MultiStepTwo";
 import { SubmitButton } from "@/components/SubmitButton";
 import IntroSection from "@/components/hero/IntroSection";
 import { Separator } from "@/components/ui/separator";
-
-// Import the updated candidates
-import { PREDEFINED_CANDIDATES, Candidate } from "@/data/data";
 
 export default function Home() {
   const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
@@ -30,7 +27,7 @@ export default function Home() {
   }
 
   const { setOpen } = useIDKit();
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
   // State management
   const [voteMethod, setVoteMethod] = useState<'select' | 'writeIn'>('select');
@@ -38,7 +35,76 @@ export default function Home() {
   const [writeInName, setWriteInName] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingCandidates, setLoadingCandidates] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<CandidateTicket[]>([]);
+
+  // Types for fetched data
+  interface Politician {
+    id: number;
+    name: string;
+    age: number;
+    partyId: number;
+    // Add other fields as needed
+  }
+
+  interface Party {
+    id: number;
+    name: string;
+    // Add other fields as needed
+  }
+
+  interface Candidate {
+    id: number;
+    presidentId: number;
+    vicePresidentId: number;
+    partyId: number;
+  }
+
+  interface CandidateTicket {
+    id: number;
+    president: Politician;
+    vicePresident: Politician;
+    party: Party;
+  }
+
+  // Fetch candidates from API
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        setLoadingCandidates(true);
+        const response = await fetch('/api/fetchElectionData');
+        const data = await response.json();
+        if (data.success) {
+          const { parties, politicians, candidates } = data.data;
+
+          // Build candidate tickets
+          const candidateTickets: CandidateTicket[] = candidates.map((candidate: Candidate) => {
+            const president = politicians.find((p: Politician) => p.id === candidate.presidentId);
+            const vicePresident = politicians.find((p: Politician) => p.id === candidate.vicePresidentId);
+            const party = parties.find((p: Party) => p.id === candidate.partyId);
+            return {
+              id: candidate.id,
+              president,
+              vicePresident,
+              party,
+            };
+          });
+
+          setCandidates(candidateTickets);
+        } else {
+          setFetchError('Failed to fetch candidates');
+        }
+      } catch (error) {
+        console.error('Error fetching candidates:', error);
+        setFetchError('Error fetching candidates');
+      } finally {
+        setLoadingCandidates(false);
+      }
+    };
+    fetchCandidates();
+  }, []);
 
   const handleWriteInChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWriteInName(e.target.value);
@@ -48,12 +114,6 @@ export default function Home() {
 
   const handleWalletAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWalletAddress(e.target.value);
-    // Optionally, you can trigger the loader here if you want it to appear immediately upon input
-    // For example:
-    // if (e.target.value) {
-    //   setLoading(true);
-    //   // Trigger any processing if needed
-    // }
   };
 
   const handleCandidateSelect = (presidentName: string) => {
@@ -75,15 +135,15 @@ export default function Home() {
       setError(`Verification failed: ${data.detail}`);
       return; // Exit if verification fails
     }
-  
+
     try {
       // Start loading state and clear any previous errors
       setLoading(true);
       setError(null);
-  
+
       // Get the selected candidate name based on vote method
       const candidateName = voteMethod === 'select' ? selectedCandidate : writeInName;
-  
+
       // Save the vote to your database
       const response = await fetch("/api/saveVote", {
         method: "POST",
@@ -106,12 +166,12 @@ export default function Home() {
           candidateName,
         }),
       });
-  
+
       const saveVoteData = await response.json();
-  
+
       if (responseLedger.ok && response.ok && saveVoteData.success) {
         // If vote was saved successfully, process rewards if wallet address provided
-        
+
         // 1. Send XRP
         if (walletAddress) {
           try {
@@ -121,7 +181,7 @@ export default function Home() {
             // Continue even if XRP send fails
           }
         }
-  
+
         // 2. Send NFT and get the response data
         let nftData = null;
         if (walletAddress) {
@@ -131,37 +191,35 @@ export default function Home() {
             console.error('Error sending NFT:', err);
           }
         }
-        
-  
+
         // 3. Build the success URL with parameters
         const successParams = new URLSearchParams();
-        
+
         if (walletAddress) {
           // Add wallet address to URL params
           successParams.append('walletAddress', walletAddress);
-        
+
           // Add sell offer index if NFT was successfully created
           if (nftData?.sellOfferIndex) {
             successParams.append('sellOfferIndex', nftData.sellOfferIndex);
           }
         }
-        
+
         console.log('This is your nftData: ', nftData);
-        
-  
+
         // 4. Redirect to success page with parameters
         router.push(`/success?${successParams.toString()}`);
-        
+
       } else {
         // If vote saving failed, show error
         setError(saveVoteData.detail || "Failed to save your vote.");
       }
-  
+
     } catch (err) {
       // Handle any unexpected errors
       console.error("Error during voting:", err);
       setError("An unexpected error occurred.");
-      
+
     } finally {
       // Always turn off loading state
       setLoading(false);
@@ -214,19 +272,19 @@ export default function Home() {
             tokenUrl: 'https://example.com/nft-metadata' // Replace with your actual metadata URL
           }),
         });
-  
+
         // Parse the response to get nftData
         const nftData = await nftResponse.json();
-  
+
         console.log('NFT Transfer Response:', nftData);
-  
+
         if (nftData.success) {
           console.log('NFT successfully minted and transferred!');
         } else {
           console.error('NFT minting failed:', nftData.detail);
           setError(`NFT minting failed: ${nftData.detail}`);
         }
-  
+
         return nftData; // Return the parsed data
       } catch (error: any) {
         console.error('Error minting NFT:', error);
@@ -262,39 +320,40 @@ export default function Home() {
                 Vote!
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PREDEFINED_CANDIDATES.map((ticket: Candidate) => (
-                <Card
-                  key={ticket.id}
-                  className={`cursor-pointer transition-all hover:shadow-2xl ${
-                    selectedCandidate === ticket.president.name
-                      ? 'ring-2 ring-blue-500 shadow-2xl' 
-                      : 'hover:border-blue-700'
-                  } bg-gray-800 border border-gray-700`}
-                  onClick={() => handleCandidateSelect(ticket.president.name)}
-                >
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center justify-between">
-                      <span className="text-gray-100">{ticket.president.name}</span>
-                      {selectedCandidate === ticket.president.name && (
-                        <CheckCircle2 className="text-blue-400 h-5 w-5" />
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-400">Vice President:</span>
-                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident.name}</span>
-                    </div>
-                    {/* Optionally, display additional details about the vice president */}
-                    {/* <div className="flex items-center gap-2 mt-2">
-                      <span className="text-sm text-gray-400">Party:</span>
-                      <span className="text-sm font-medium text-gray-200">{ticket.vicePresident.party}</span>
-                    </div> */}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            {loadingCandidates ? (
+              <div className="text-gray-100">Loading candidates...</div>
+            ) : fetchError ? (
+              <div className="text-red-400">Error: {fetchError}</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {candidates.map((ticket: CandidateTicket) => (
+                  <Card
+                    key={ticket.id}
+                    className={`cursor-pointer transition-all hover:shadow-2xl ${
+                      selectedCandidate === ticket.president.name
+                        ? 'ring-2 ring-blue-500 shadow-2xl' 
+                        : 'hover:border-blue-700'
+                    } bg-gray-800 border border-gray-700`}
+                    onClick={() => handleCandidateSelect(ticket.president.name)}
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center justify-between">
+                        <span className="text-gray-100">{ticket.president.name}</span>
+                        {selectedCandidate === ticket.president.name && (
+                          <CheckCircle2 className="text-blue-400 h-5 w-5" />
+                        )}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400">Vice President:</span>
+                        <span className="text-sm font-medium text-gray-200">{ticket.vicePresident.name}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Write-in Section */}

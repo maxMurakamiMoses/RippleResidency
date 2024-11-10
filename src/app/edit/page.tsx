@@ -1,3 +1,5 @@
+//this is not secure, if you actually want to make it secure, use middelware...
+
 "use client"
 
 import React, { useState, FormEvent } from 'react';
