@@ -39,6 +39,8 @@ const ElectionDashboard = () => {
   const [data, setData] = useState<ElectionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // State for editing Parties
   const [editingPartyId, setEditingPartyId] = useState<number | null>(null);
   const [partyForm, setPartyForm] = useState({
     id: 0,
@@ -49,6 +51,23 @@ const ElectionDashboard = () => {
     ctaLink: '',
     content: '',
   });
+
+  // State for editing Candidates
+  const [editingCandidateId, setEditingCandidateId] = useState<number | null>(null);
+// Add new fields to candidateForm state
+const [candidateForm, setCandidateForm] = useState({
+    id: 0,
+    presidentId: 0,
+    vicePresidentId: 0,
+    presidentName: '',
+    presidentAge: 0,
+    presidentSex: '',
+    vicePresidentName: '',
+    vicePresidentAge: 0,
+    vicePresidentSex: '',
+  });
+  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -72,8 +91,15 @@ const ElectionDashboard = () => {
     fetchData();
   }, []);
 
-  // Handler to open edit form
-  const handleEditClick = (partyId: number) => {
+  // Helper function to get politician details by ID
+  const getPolitician = (id: number) => {
+    return data?.politicians.find((p) => p.id === id);
+  };
+
+  // Handlers for editing Parties
+
+  // Handler to open edit form for a party
+  const handleEditPartyClick = (partyId: number) => {
     if (data) {
       const party = data.parties.find((p) => p.id === partyId);
       if (party) {
@@ -83,8 +109,8 @@ const ElectionDashboard = () => {
     }
   };
 
-  // Handler to close edit form
-  const handleCancelEdit = () => {
+  // Handler to close edit form for a party
+  const handleCancelPartyEdit = () => {
     setEditingPartyId(null);
     setPartyForm({
       id: 0,
@@ -97,8 +123,8 @@ const ElectionDashboard = () => {
     });
   };
 
-  // Handler for form input changes
-  const handleInputChange = (
+  // Handler for party form input changes
+  const handlePartyInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPartyForm({
@@ -107,42 +133,146 @@ const ElectionDashboard = () => {
     });
   };
 
-  // Handler for form submission
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  // Handler for party form submission
+  const handlePartyFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/updateParty', {
+        const response = await fetch('/api/updateCandidate', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(candidateForm),
+        });
+    
+        const result = await response.json();
+    
+        if (!result.success) {
+          throw new Error(result.detail || 'Failed to update candidate');
+        }
+    
+        // Update local state with the updated candidate and politicians data
+        if (data) {
+          const updatedCandidates = data.candidates.map((candidate) =>
+            candidate.id === candidateForm.id ? result.data.candidate : candidate
+          );
+    
+          const updatedPoliticians = data.politicians.map((politician) => {
+            if (politician.id === result.data.president.id) {
+              return result.data.president;
+            } else if (politician.id === result.data.vicePresident.id) {
+              return result.data.vicePresident;
+            } else {
+              return politician;
+            }
+          });
+    
+          setData({
+            ...data,
+            candidates: updatedCandidates,
+            politicians: updatedPoliticians,
+          });
+        }
+    
+        // Close the edit form
+        handleCancelCandidateEdit();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+  // Handlers for editing Candidates
+
+  // Handler to open edit form for a candidate
+  const handleEditCandidateClick = (candidateId: number) => {
+    if (data) {
+      const candidate = data.candidates.find((c) => c.id === candidateId);
+      if (candidate) {
+        const president = getPolitician(candidate.presidentId);
+        const vicePresident = getPolitician(candidate.vicePresidentId);
+  
+        setCandidateForm({
+          id: candidate.id,
+          presidentId: candidate.presidentId,
+          vicePresidentId: candidate.vicePresidentId,
+          presidentName: president?.name || '',
+          presidentAge: president?.age || 0,
+          presidentSex: president?.sex || '',
+          vicePresidentName: vicePresident?.name || '',
+          vicePresidentAge: vicePresident?.age || 0,
+          vicePresidentSex: vicePresident?.sex || '',
+        });
+        setEditingCandidateId(candidateId);
+      }
+    }
+  };
+  
+
+  // Handler to close edit form for a candidate
+  const handleCancelCandidateEdit = () => {
+    setEditingCandidateId(null);
+    setCandidateForm({
+      id: 0,
+      presidentId: 0,
+      vicePresidentId: 0,
+    });
+  };
+
+  // Handler for candidate form submission
+  const handleCandidateFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+  
+    try {
+      const response = await fetch('/api/updateCandidate', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(partyForm),
+        body: JSON.stringify(candidateForm),
       });
-
+  
       const result = await response.json();
-
+  
       if (!result.success) {
-        throw new Error(result.detail || 'Failed to update party');
+        throw new Error(result.detail || 'Failed to update candidate');
       }
-
-      // Update local state with the updated party data
+  
+      // Update local state with the updated candidate and politicians data
       if (data) {
-        const updatedParties = data.parties.map((party) =>
-          party.id === partyForm.id ? result.data : party
+        const updatedCandidates = data.candidates.map((candidate) =>
+          candidate.id === candidateForm.id ? result.data.candidate : candidate
         );
-        setData({ ...data, parties: updatedParties });
+  
+        const updatedPoliticians = data.politicians.map((politician) => {
+          if (politician.id === result.data.president.id) {
+            return result.data.president;
+          } else if (politician.id === result.data.vicePresident.id) {
+            return result.data.vicePresident;
+          } else {
+            return politician;
+          }
+        });
+  
+        setData({
+          ...data,
+          candidates: updatedCandidates,
+          politicians: updatedPoliticians,
+        });
       }
-
+  
       // Close the edit form
-      handleCancelEdit();
+      handleCancelCandidateEdit();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   if (loading) {
     return (
@@ -168,11 +298,6 @@ const ElectionDashboard = () => {
     return null;
   }
 
-  // Helper function to get politician details by ID
-  const getPolitician = (id: number) => {
-    return data.politicians.find((p) => p.id === id);
-  };
-
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Election Info Header */}
@@ -197,6 +322,7 @@ const ElectionDashboard = () => {
 
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Election Statistics */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -208,7 +334,9 @@ const ElectionDashboard = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b pb-2">
                     <span>Total Candidate Pairs</span>
-                    <span className="text-xl font-semibold">{data.candidates.length}</span>
+                    <span className="text-xl font-semibold">
+                      {data.candidates.length}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center border-b pb-2">
                     <span>Total Parties</span>
@@ -216,12 +344,15 @@ const ElectionDashboard = () => {
                   </div>
                   <div className="flex justify-between items-center border-b pb-2">
                     <span>Total Politicians</span>
-                    <span className="text-xl font-semibold">{data.politicians.length}</span>
+                    <span className="text-xl font-semibold">
+                      {data.politicians.length}
+                    </span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Quick Links */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -231,11 +362,11 @@ const ElectionDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {data.parties.map(party => (
+                  {data.parties.map((party) => (
                     <div key={party.id} className="flex items-center gap-2">
                       <span>{party.emoji}</span>
-                      <a 
-                        href={party.ctaLink} 
+                      <a
+                        href={party.ctaLink}
                         className="text-blue-500 hover:underline"
                       >
                         {party.title}
@@ -253,38 +384,194 @@ const ElectionDashboard = () => {
             {data.candidates.map((candidate) => {
               const president = getPolitician(candidate.presidentId);
               const vicePresident = getPolitician(candidate.vicePresidentId);
-              
+
               return (
                 <Card key={candidate.id} className="overflow-hidden">
-                  <CardHeader className="bg-gray-50">
+                  <CardHeader className="bg-gray-50 flex justify-between items-center">
                     <CardTitle>Candidate Pair #{candidate.id}</CardTitle>
+                    <button
+                      onClick={() => handleEditCandidateClick(candidate.id)}
+                      className="inline-flex items-center px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4 mr-1" />
+                      Edit
+                    </button>
                   </CardHeader>
                   <CardContent className="mt-4">
-                    <div className="space-y-6">
-                      {/* President Details */}
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h3 className="font-semibold text-lg mb-3">Presidential Candidate</h3>
-                        <div className="space-y-2">
-                          <p className="font-medium">{president?.name}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <p><span className="text-gray-600">Age:</span> {president?.age}</p>
-                            <p><span className="text-gray-600">Sex:</span> {president?.sex}</p>
+                  {editingCandidateId === candidate.id ? (
+  // Edit Form for Candidate
+  <form onSubmit={handleCandidateFormSubmit}>
+    <div className="space-y-4">
+      {/* Presidential Candidate */}
+      <div className="p-4 bg-blue-50 rounded-lg">
+        <h3 className="font-semibold text-lg mb-3">
+          Presidential Candidate
+        </h3>
+        <div className="space-y-2">
+          <div>
+            <label className="block text-sm font-medium">Name</label>
+            <input
+              type="text"
+              name="presidentName"
+              value={candidateForm.presidentName}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  presidentName: e.target.value,
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Age</label>
+            <input
+              type="number"
+              name="presidentAge"
+              value={candidateForm.presidentAge}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  presidentAge: Number(e.target.value),
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Sex</label>
+            <input
+              type="text"
+              name="presidentSex"
+              value={candidateForm.presidentSex}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  presidentSex: e.target.value,
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+        </div>
+      </div>
+      {/* Vice Presidential Candidate */}
+      <div className="p-4 bg-green-50 rounded-lg">
+        <h3 className="font-semibold text-lg mb-3">
+          Vice Presidential Candidate
+        </h3>
+        <div className="space-y-2">
+          <div>
+            <label className="block text-sm font-medium">Name</label>
+            <input
+              type="text"
+              name="vicePresidentName"
+              value={candidateForm.vicePresidentName}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  vicePresidentName: e.target.value,
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Age</label>
+            <input
+              type="number"
+              name="vicePresidentAge"
+              value={candidateForm.vicePresidentAge}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  vicePresidentAge: Number(e.target.value),
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Sex</label>
+            <input
+              type="text"
+              name="vicePresidentSex"
+              value={candidateForm.vicePresidentSex}
+              onChange={(e) =>
+                setCandidateForm({
+                  ...candidateForm,
+                  vicePresidentSex: e.target.value,
+                })
+              }
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="mt-4 flex items-center justify-end space-x-2">
+      <button
+        type="button"
+        onClick={handleCancelCandidateEdit}
+        className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      >
+        {isSubmitting ? 'Saving...' : 'Save'}
+      </button>
+    </div>
+  </form>
+                    ) : (
+                      // Display Candidate Details
+                      <div className="space-y-6">
+                        {/* President Details */}
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h3 className="font-semibold text-lg mb-3">
+                            Presidential Candidate
+                          </h3>
+                          <div className="space-y-2">
+                            <p className="font-medium">{president?.name}</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <p>
+                                <span className="text-gray-600">Age:</span> {president?.age}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">Sex:</span> {president?.sex}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Vice President Details */}
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h3 className="font-semibold text-lg mb-3">Vice Presidential Candidate</h3>
-                        <div className="space-y-2">
-                          <p className="font-medium">{vicePresident?.name}</p>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <p><span className="text-gray-600">Age:</span> {vicePresident?.age}</p>
-                            <p><span className="text-gray-600">Sex:</span> {vicePresident?.sex}</p>
+                        {/* Vice President Details */}
+                        <div className="p-4 bg-green-50 rounded-lg">
+                          <h3 className="font-semibold text-lg mb-3">
+                            Vice Presidential Candidate
+                          </h3>
+                          <div className="space-y-2">
+                            <p className="font-medium">{vicePresident?.name}</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <p>
+                                <span className="text-gray-600">Age:</span> {vicePresident?.age}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">Sex:</span> {vicePresident?.sex}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               );
@@ -304,8 +591,8 @@ const ElectionDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   {editingPartyId === party.id ? (
-                    // Edit Form
-                    <form onSubmit={handleFormSubmit}>
+                    // Edit Form for Party
+                    <form onSubmit={handlePartyFormSubmit}>
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium">Title</label>
@@ -313,17 +600,19 @@ const ElectionDashboard = () => {
                             type="text"
                             name="title"
                             value={partyForm.title}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium">Description</label>
+                          <label className="block text-sm font-medium">
+                            Description
+                          </label>
                           <textarea
                             name="description"
                             value={partyForm.description}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
@@ -334,7 +623,7 @@ const ElectionDashboard = () => {
                             type="text"
                             name="emoji"
                             value={partyForm.emoji}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
@@ -345,7 +634,7 @@ const ElectionDashboard = () => {
                             type="text"
                             name="ctaText"
                             value={partyForm.ctaText}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
@@ -356,7 +645,7 @@ const ElectionDashboard = () => {
                             type="url"
                             name="ctaLink"
                             value={partyForm.ctaLink}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
@@ -366,7 +655,7 @@ const ElectionDashboard = () => {
                           <textarea
                             name="content"
                             value={partyForm.content}
-                            onChange={handleInputChange}
+                            onChange={handlePartyInputChange}
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                             required
                           />
@@ -375,7 +664,7 @@ const ElectionDashboard = () => {
                       <div className="mt-4 flex items-center justify-end space-x-2">
                         <button
                           type="button"
-                          onClick={handleCancelEdit}
+                          onClick={handleCancelPartyEdit}
                           className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
                         >
                           Cancel
@@ -401,7 +690,7 @@ const ElectionDashboard = () => {
                         {party.ctaText}
                       </a>
                       <button
-                        onClick={() => handleEditClick(party.id)}
+                        onClick={() => handleEditPartyClick(party.id)}
                         className="mt-4 ml-2 inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
                       >
                         <Edit3 className="w-4 h-4 mr-1" />
