@@ -8,8 +8,8 @@ import {
   CardTitle,
   CardContent,
 } from "@/components/ui/card";
-import { VoteCountsPieChart } from "@/components/sucess/VoteCountsPieChart";
-import Podium from "@/components/sucess/Podium";
+import { VoteCountsPieChart } from "@/components/success/VoteCountsPieChart";
+import Podium from "@/components/success/Podium";
 
 // Define interface for vote counts
 interface VoteCount {
