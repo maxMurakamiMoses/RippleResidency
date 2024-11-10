@@ -1,12 +1,59 @@
+// File 1: PartySection.tsx
 import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/hooks/use-outside-click";
-import { partyData, PartyData } from "@/data/data";
+
+interface Party {
+  id: string;
+  title: string;
+  description: string;
+  emoji: string;
+  ctaText: string;
+  ctaLink: string;
+  content: string;
+}
+
+interface ElectionData {
+  success: boolean;
+  data: {
+    electionInfo: any; // Replace with actual type if available
+    parties: Party[];
+    politicians: any[]; // Replace with actual type if available
+    candidates: any[]; // Replace with actual type if available
+  };
+}
 
 export function PartySection() {
-  const [active, setActive] = useState<PartyData | null>(null);
+  const [active, setActive] = useState<Party | null>(null);
+  const [parties, setParties] = useState<Party[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const ref = useRef(null);
   const id = useId();
+
+  useEffect(() => {
+    async function fetchElectionData() {
+      try {
+        const response = await fetch("/api/fetchElectionData");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const result: ElectionData = await response.json();
+        if (result.success) {
+          setParties(result.data.parties);
+        } else {
+          throw new Error("Failed to fetch election data.");
+        }
+      } catch (err: any) {
+        console.error("Error fetching election data:", err);
+        setError(err.message || "An unknown error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchElectionData();
+  }, []);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -26,6 +73,24 @@ export function PartySection() {
   }, [active]);
 
   useOutsideClick(ref, () => setActive(null));
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl">
+        <h1 className="text-4xl font-bold text-gray-100 mb-4">Learn About the Parties Running</h1>
+        <p className="text-gray-300">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-2xl">
+        <h1 className="text-4xl font-bold text-gray-100 mb-4">Learn About the Parties Running</h1>
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl">
@@ -89,6 +154,7 @@ export function PartySection() {
                     layoutId={`button-${active.title}-${id}`}
                     href={active.ctaLink}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
                   >
                     {active.ctaText}
@@ -111,10 +177,10 @@ export function PartySection() {
         ) : null}
       </AnimatePresence>
       <ul className="w-full gap-4">
-        {partyData.map((card) => (
+        {parties.map((card) => (
           <motion.div
             layoutId={`card-${card.title}-${id}`}
-            key={`card-${card.title}-${id}`}
+            key={`card-${card.id}-${id}`} // Use unique identifier if available
             onClick={() => setActive(card)}
             className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
           >

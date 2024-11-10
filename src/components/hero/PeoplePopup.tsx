@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Roboto_Mono } from 'next/font/google';
 import { FaUserCircle } from 'react-icons/fa';
-import { PREDEFINED_CANDIDATES, Candidate, Politician } from '@/data/data'; // Adjust the path as necessary
 
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
@@ -11,9 +10,26 @@ const robotoMono = Roboto_Mono({
   variable: '--font-roboto-mono',
 });
 
-// Extend Candidate interface for Popup
+// Define TypeScript interfaces based on API response
+interface Politician {
+  id: string; // Assuming each politician has a unique ID
+  name: string;
+  age: number;
+  sex: string;
+  party: string;
+}
+
+interface ElectionData {
+  success: boolean;
+  data: {
+    electionInfo: any; // Replace with actual type if available
+    parties: any[]; // Replace with actual type if available
+    politicians: Politician[];
+    candidates: any[]; // Replace with actual type if available
+  };
+}
+
 interface Popup extends Politician {
-  id: number;
   top: number;
   left: number;
   isFadingOut: boolean;
@@ -23,19 +39,46 @@ let popupId = 0; // Unique identifier for each popup
 
 export function PeoplePopup() {
   const [popups, setPopups] = useState<Popup[]>([]);
+  const [politicians, setPoliticians] = useState<Politician[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const hasInitialPopup = useRef(false);
   const initialPopupTimeout = useRef<number | null>(null);
   const popupInterval = useRef<number | null>(null);
   const currentPopupIndex = useRef(0);
 
-  // Extract individual politicians from candidates
-  const politicians: Politician[] = PREDEFINED_CANDIDATES.flatMap(ticket => [
-    ticket.president,
-    ticket.vicePresident,
-  ]);
+  useEffect(() => {
+    async function fetchElectionData() {
+      try {
+        const response = await fetch('/api/fetchElectionData');
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const result: ElectionData = await response.json();
+        if (result.success) {
+          // Extract politicians from the fetched data
+          setPoliticians(result.data.politicians);
+        } else {
+          throw new Error('Failed to fetch election data.');
+        }
+      } catch (err: any) {
+        console.error('Error fetching election data:', err);
+        setError(err.message || 'An unknown error occurred.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchElectionData();
+  }, []);
 
   useEffect(() => {
+    if (loading || error || politicians.length === 0) {
+      return;
+    }
+
     const scheduleInitialPopup = () => {
       if (!hasInitialPopup.current) {
         initialPopupTimeout.current = window.setTimeout(() => {
@@ -59,18 +102,18 @@ export function PeoplePopup() {
         clearInterval(popupInterval.current);
       }
     };
-  }, []);
+  }, [loading, error, politicians]);
 
   const addPopup = () => {
-    const container = containerRef.current;
-    if (!container) return;
-
     if (currentPopupIndex.current >= politicians.length) {
       currentPopupIndex.current = 0; // Reset to start if we've shown all popups
     }
 
     const politician = politicians[currentPopupIndex.current];
     currentPopupIndex.current++;
+
+    const container = containerRef.current;
+    if (!container) return;
 
     const containerRect = container.getBoundingClientRect();
 
@@ -81,13 +124,9 @@ export function PeoplePopup() {
     const left = Math.random() * (containerRect.width - popupWidth);
 
     const newPopup: Popup = {
-      id: popupId++,
+      ...politician,
       top,
       left,
-      name: politician.name,
-      age: politician.age,
-      sex: politician.sex,
-      party: politician.party,
       isFadingOut: false,
     };
 
@@ -107,6 +146,22 @@ export function PeoplePopup() {
       }, 500); // Duration of fade-out animation (0.5s)
     }, 5000);
   };
+
+  if (loading) {
+    return (
+      <div className={`${robotoMono.className} relative w-full h-full`}>
+        <p className="text-center text-gray-300">Loading popups...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`${robotoMono.className} relative w-full h-full`}>
+        <p className="text-center text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div
