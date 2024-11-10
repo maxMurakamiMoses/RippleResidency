@@ -1,9 +1,11 @@
-"use client"
+// ElectionDashboard.tsx
+
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Info, Loader2, Users, Building2 } from 'lucide-react';
+import { Info, Loader2, Users, Building2, Edit3 } from 'lucide-react';
 
 interface ElectionData {
   electionInfo: {
@@ -37,17 +39,28 @@ const ElectionDashboard = () => {
   const [data, setData] = useState<ElectionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingPartyId, setEditingPartyId] = useState<number | null>(null);
+  const [partyForm, setPartyForm] = useState({
+    id: 0,
+    title: '',
+    description: '',
+    emoji: '',
+    ctaText: '',
+    ctaLink: '',
+    content: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('/api/fetchElectionData');
         const result = await response.json();
-        
+
         if (!result.success) {
           throw new Error(result.detail || 'Failed to fetch election data');
         }
-        
+
         setData(result.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -58,6 +71,78 @@ const ElectionDashboard = () => {
 
     fetchData();
   }, []);
+
+  // Handler to open edit form
+  const handleEditClick = (partyId: number) => {
+    if (data) {
+      const party = data.parties.find((p) => p.id === partyId);
+      if (party) {
+        setPartyForm(party);
+        setEditingPartyId(partyId);
+      }
+    }
+  };
+
+  // Handler to close edit form
+  const handleCancelEdit = () => {
+    setEditingPartyId(null);
+    setPartyForm({
+      id: 0,
+      title: '',
+      description: '',
+      emoji: '',
+      ctaText: '',
+      ctaLink: '',
+      content: '',
+    });
+  };
+
+  // Handler for form input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setPartyForm({
+      ...partyForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handler for form submission
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/updateParty', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(partyForm),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.detail || 'Failed to update party');
+      }
+
+      // Update local state with the updated party data
+      if (data) {
+        const updatedParties = data.parties.map((party) =>
+          party.id === partyForm.id ? result.data : party
+        );
+        setData({ ...data, parties: updatedParties });
+      }
+
+      // Close the edit form
+      handleCancelEdit();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -85,7 +170,7 @@ const ElectionDashboard = () => {
 
   // Helper function to get politician details by ID
   const getPolitician = (id: number) => {
-    return data.politicians.find(p => p.id === id);
+    return data.politicians.find((p) => p.id === id);
   };
 
   return (
@@ -218,14 +303,112 @@ const ElectionDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-4">{party.description}</p>
-                  <p className="text-sm text-gray-600">{party.content}</p>
-                  <a 
-                    href={party.ctaLink}
-                    className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                  >
-                    {party.ctaText}
-                  </a>
+                  {editingPartyId === party.id ? (
+                    // Edit Form
+                    <form onSubmit={handleFormSubmit}>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium">Title</label>
+                          <input
+                            type="text"
+                            name="title"
+                            value={partyForm.title}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">Description</label>
+                          <textarea
+                            name="description"
+                            value={partyForm.description}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">Emoji</label>
+                          <input
+                            type="text"
+                            name="emoji"
+                            value={partyForm.emoji}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">CTA Text</label>
+                          <input
+                            type="text"
+                            name="ctaText"
+                            value={partyForm.ctaText}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">CTA Link</label>
+                          <input
+                            type="url"
+                            name="ctaLink"
+                            value={partyForm.ctaLink}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium">Content</label>
+                          <textarea
+                            name="content"
+                            value={partyForm.content}
+                            onChange={handleInputChange}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center justify-end space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleCancelEdit}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        >
+                          {isSubmitting ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    // Display Party Details
+                    <>
+                      <p className="mb-4">{party.description}</p>
+                      <p className="text-sm text-gray-600">{party.content}</p>
+                      <a
+                        href={party.ctaLink}
+                        className="inline-block mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      >
+                        {party.ctaText}
+                      </a>
+                      <button
+                        onClick={() => handleEditClick(party.id)}
+                        className="mt-4 ml-2 inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                      >
+                        <Edit3 className="w-4 h-4 mr-1" />
+                        Edit
+                      </button>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             ))}
