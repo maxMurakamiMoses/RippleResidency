@@ -20,6 +20,7 @@
     "@types/react-dom": "18.3.0",
     "@worldcoin/idkit": "^1.2.2",
     "@worldcoin/idkit-core": "^1.2.2",
+    "binascii": "^0.0.2",
     "bufferutil": "^4.0.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

@@ -95,10 +95,21 @@ export default function Home() {
           nullifierHash: result.nullifier_hash,
         }),
       });
+
+      //Save vote to ledger
+      const responseLedger = await fetch("/api/saveVoteToLedger", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          candidateName,
+        }),
+      });
   
       const saveVoteData = await response.json();
   
-      if (response.ok && saveVoteData.success) {
+      if (responseLedger.ok && response.ok && saveVoteData.success) {
         // If vote was saved successfully, process rewards if wallet address provided
         
         // 1. Send XRP
