@@ -387,16 +387,21 @@ const [candidateForm, setCandidateForm] = useState({
 
               return (
                 <Card key={candidate.id} className="overflow-hidden">
-                  <CardHeader className="bg-gray-50 flex justify-between items-center">
-                    <CardTitle>Candidate Pair #{candidate.id}</CardTitle>
-                    <button
-                      onClick={() => handleEditCandidateClick(candidate.id)}
-                      className="inline-flex items-center px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-                    >
-                      <Edit3 className="w-4 h-4 mr-1" />
-                      Edit
-                    </button>
-                  </CardHeader>
+<CardHeader className="bg-gray-50 flex flex-row justify-between items-center w-full flex-nowrap">
+  <span className="text-lg font-medium">
+    Candidate Pair #{candidate.id}
+  </span>
+  <button
+    onClick={() => handleEditCandidateClick(candidate.id)}
+    className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+  >
+    <Edit3 className="w-4 h-4 mr-1" />
+    Edit
+  </button>
+</CardHeader>
+
+
+
                   <CardContent className="mt-4">
                   {editingCandidateId === candidate.id ? (
   // Edit Form for Candidate
