@@ -1,20 +1,21 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useOutsideClick } from "@/hooks/use-outside-click";
+import { partyData, PartyData } from "@/data/data";
 
 export function PartySection() {
-  const [active, setActive] = useState(null);
+  const [active, setActive] = useState<PartyData | null>(null);
   const ref = useRef(null);
   const id = useId();
 
   useEffect(() => {
-    function onKeyDown(event) {
+    function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setActive(false);
+        setActive(null);
       }
     }
 
-    if (active && typeof active === "object") {
+    if (active) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -30,7 +31,7 @@ export function PartySection() {
     <div className="max-w-2xl">
       <h1 className="text-4xl font-bold text-gray-100 mb-4">Learn About the Parties Running</h1>
       <AnimatePresence>
-        {active && typeof active === "object" && (
+        {active && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -40,7 +41,7 @@ export function PartySection() {
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {active && typeof active === "object" ? (
+        {active ? (
           <div className="fixed inset-0 grid place-items-center z-[100]">
             <motion.button
               key={`button-${active.title}-${id}`}
@@ -101,9 +102,7 @@ export function PartySection() {
                     exit={{ opacity: 0 }}
                     className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)]"
                   >
-                    {typeof active.content === "function"
-                      ? active.content()
-                      : active.content}
+                    <p>{active.content}</p>
                   </motion.div>
                 </div>
               </div>
@@ -112,7 +111,7 @@ export function PartySection() {
         ) : null}
       </AnimatePresence>
       <ul className="w-full gap-4">
-        {cards.map((card) => (
+        {partyData.map((card) => (
           <motion.div
             layoutId={`card-${card.title}-${id}`}
             key={`card-${card.title}-${id}`}
@@ -179,80 +178,3 @@ export const CloseIcon = () => {
     </motion.svg>
   );
 };
-const cards = [
-  {
-    description: "The Democratic Party",
-    title: "Democrats",
-    emoji: "🔵",
-    ctaText: "Open",
-    ctaLink: "https://democrats.org",
-    content: () => {
-      return (
-        <p>
-          The Democratic Party, founded in 1828, is one of America's two major political parties. It generally supports progressive social policies, stronger environmental regulations, and a more active federal government role in addressing economic and social issues. <br /> <br />
-          Key positions include support for universal healthcare access, climate change action, gun control, and protecting civil rights. The party's base includes urban voters, minorities, young people, and college-educated professionals. Notable recent presidents include Barack Obama, Bill Clinton, and Joe Biden.
-        </p>
-      );
-    },
-  },
-  {
-    description: "The Republican Party",
-    title: "Republicans",
-    emoji: "🔴",
-    ctaText: "Open",
-    ctaLink: "https://gop.com",
-    content: () => {
-      return (
-        <p>
-          The Republican Party, founded in 1854, is America's other major political party. It generally advocates for conservative social values, free market economics, lower taxes, and limited government intervention. <br /> <br />
-          Key positions include support for Second Amendment rights, strong national defense, reduced government regulation, and traditional social values. The party's base includes rural voters, evangelical Christians, and business communities. Notable recent presidents include Donald Trump, George W. Bush, and Ronald Reagan.
-        </p>
-      );
-    },
-  },
-  {
-    description: "The Green Party",
-    title: "Green Party",
-    emoji: "🌿",
-    ctaText: "Open",
-    ctaLink: "https://www.gp.org",
-    content: () => {
-      return (
-        <p>
-          The Green Party is a progressive political party focused on environmental issues, social justice, and grassroots democracy. Founded in 2001, it advocates for radical action on climate change, universal healthcare, and economic reform. <br /> <br />
-          Key positions include support for the Green New Deal, peace and demilitarization, and electoral reform including ranked choice voting. While smaller than the major parties, it has influenced national dialogue on environmental and social issues.
-        </p>
-      );
-    },
-  },
-  {
-    description: "The Libertarian Party",
-    title: "Libertarians",
-    emoji: "🗽",
-    ctaText: "Open",
-    ctaLink: "https://www.lp.org",
-    content: () => {
-      return (
-        <p>
-          The Libertarian Party, founded in 1971, advocates for maximum individual liberty and minimal government intervention. It combines fiscal conservatism with social liberalism. <br /> <br />
-          Key positions include dramatic reduction of government size and spending, protection of civil liberties, free market capitalism, and non-interventionist foreign policy. While a third party, it often achieves significant ballot access and has influenced national discussions on individual rights and government power.
-        </p>
-      );
-    },
-  },
-  {
-    description: "Independent Movement",
-    title: "Independents",
-    emoji: "⚖️",
-    ctaText: "Open",
-    ctaLink: "https://independentvoting.org",
-    content: () => {
-      return (
-        <p>
-          Independent voters and candidates are not affiliated with any political party. This growing segment of American politics represents voters who prefer to evaluate issues and candidates on their individual merits rather than party loyalty. <br /> <br />
-          Independent voters often play a crucial role in elections, particularly in swing states. Notable independent politicians have included Bernie Sanders (who caucuses with Democrats) and Angus King. The movement advocates for reduced partisanship and electoral reforms.
-        </p>
-      );
-    },
-  },
-];

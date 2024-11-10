@@ -16,7 +16,7 @@ import IntroSection from "@/components/hero/IntroSection";
 import { Separator } from "@/components/ui/separator";
 
 // Import the updated candidates
-import { PREDEFINED_CANDIDATES, Candidate } from "@/data/candidates";
+import { PREDEFINED_CANDIDATES, Candidate } from "@/data/data";
 
 export default function Home() {
   const app_id = process.env.NEXT_PUBLIC_WLD_APP_ID as `app_${string}`;
@@ -259,7 +259,7 @@ export default function Home() {
             <div className="flex items-center gap-2 mb-4">
               <Users className="h-6 w-6 text-blue-400" />
               <h2 className="text-xl font-semibold text-gray-100">
-                Presidential Tickets
+                Vote!
               </h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

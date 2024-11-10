@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Roboto_Mono } from 'next/font/google';
 import { FaUserCircle } from 'react-icons/fa';
-import { PREDEFINED_CANDIDATES, Candidate, Politician } from '@/data/candidates'; // Adjust the path as necessary
+import { PREDEFINED_CANDIDATES, Candidate, Politician } from '@/data/data'; // Adjust the path as necessary
 
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],

@@ -12,6 +12,11 @@ const Page = () => {
           Vote
         </button>
       </Link>
+      <Link href="/edit">
+        <button className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105'>
+          Edit the election
+        </button>
+      </Link>
     </div>
   )
 }

@@ -5,6 +5,7 @@
 import React from "react";
 import { TextGenerateEffect } from "../ui/text-generate-effect";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { electionInfo } from "@/data/data";
 
 interface TextRevealProps {
   title?: string;
@@ -12,8 +13,8 @@ interface TextRevealProps {
 }
 
 export function TextReveal({
-  title = "2024 Presidential Election",
-  description = `The presidential election is underway. Citizens are making their voices heard, choosing leaders who will shape our future. Every vote counts in this pivotal moment. Democracy in action, forging the path forward. Make your vote matter and influence the course of our nation.`
+  title = electionInfo.title,
+  description = electionInfo.description,
 }: TextRevealProps) {
   return (
     <Card className="bg-gray-800/50 border-gray-700 mb-20">
