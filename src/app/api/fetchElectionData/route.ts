@@ -1,52 +1,29 @@
-// app/api/electionData/route.ts
-
+// app/api/election/route.ts
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    // Fetch all required data concurrently
-    const [parties, politicians, candidates, electionInfo] = await Promise.all([
-      prisma.party.findMany({
-        include: {
-          politicians: true, // Include associated politicians
-        },
-      }),
-      prisma.politician.findMany({
-        include: {
-          party: true, // Include associated party
-        },
-      }),
-      prisma.candidate.findMany({
-        include: {
-          president: {
-            include: { party: true }, // Include president's party
-          },
-          vicePresident: {
-            include: { party: true }, // Include vice president's party
-          },
-        },
-      }),
-      prisma.electionInfo.findMany(),
+    const [electionInfo, parties, politicians, candidates] = await Promise.all([
+      prisma.electionInfo.findFirst(),
+      prisma.party.findMany(),
+      prisma.politician.findMany(),
+      prisma.candidate.findMany(),
     ]);
 
-    // Structure the response data
-    const data = {
-      parties,
-      politicians,
-      candidates,
-      electionInfo,
-    };
-
-    return NextResponse.json(data, { status: 200 });
-  } catch (error: any) {
+    return NextResponse.json({
+      success: true,
+      data: { electionInfo, parties, politicians, candidates }
+    }, { status: 200 });
+  } catch (error) {
     console.error('Error fetching election data:', error);
-
     return NextResponse.json(
-      { error: 'Failed to fetch election data.' },
+      { success: false, detail: 'Internal Server Error' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

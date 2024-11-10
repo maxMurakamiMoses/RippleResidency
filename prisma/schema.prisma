@@ -17,33 +17,26 @@ model Vote {
 }
 
 model Party {
-  id          Int          @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   description String
-  title       String       @unique
+  title       String @unique
   emoji       String
   ctaText     String
   ctaLink     String
   content     String
-  politicians Politician[]
 }
 
 model Politician {
-  id                     Int         @id @default(autoincrement())
-  name                   String
-  age                    Int
-  sex                    String
-  partyId                Int
-  party                  Party        @relation(fields: [partyId], references: [id])
-  presidentCandidates    Candidate[]  @relation("PresidentCandidates")
-  vicePresidentCandidates Candidate[] @relation("VicePresidentCandidates")
+  id   Int    @id @default(autoincrement())
+  name String
+  age  Int
+  sex  String
 }
 
 model Candidate {
-  id              Int        @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   presidentId     Int
   vicePresidentId Int
-  president       Politician @relation("PresidentCandidates", fields: [presidentId], references: [id])
-  vicePresident   Politician @relation("VicePresidentCandidates", fields: [vicePresidentId], references: [id])
 }
 
 model ElectionInfo {
