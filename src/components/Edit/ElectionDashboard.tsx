@@ -1,63 +1,18 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Award, Vote, Info } from 'lucide-react';
 
-interface Party {
-  id: number;
-  description: string;
-  title: string;
-  emoji: string;
-  ctaText: string;
-  ctaLink: string;
-  content: string;
-  politicians: Politician[];
-}
-
-interface Politician {
-  id: number;
-  name: string;
-  age: number;
-  sex: string;
-  partyId: number;
-  party: {
-    id: number;
-    title: string;
-    // ... other party fields
-  };
-}
-
-interface Candidate {
-  id: number;
-  presidentId: number;
-  vicePresidentId: number;
-  president: Politician;
-  vicePresident: Politician;
-}
-
-interface ElectionInfo {
-  id: number;
-  title: string;
-  description: string;
-}
-
-interface ElectionData {
-  parties: Party[];
-  politicians: Politician[];
-  candidates: Candidate[];
-  electionInfo: ElectionInfo[];
-}
-
 const ElectionDashboard = () => {
-  const [data, setData] = useState<ElectionData>({
+  const [data, setData] = useState({
     parties: [],
     politicians: [],
     candidates: [],
     electionInfo: [],
   });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchElectionData = async () => {
@@ -66,10 +21,10 @@ const ElectionDashboard = () => {
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
-        const result: ElectionData = await response.json();
+        const result = await response.json();
         setData(result);
         setLoading(false);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Failed to fetch election data:', err);
         setError(err.message || 'An unknown error occurred.');
         setLoading(false);
@@ -111,20 +66,17 @@ const ElectionDashboard = () => {
       </div>
 
       <Tabs defaultValue="parties" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
-          <TabsTrigger value="parties" className="flex items-center gap-2">
+        {/* Updated TabsList */}
+        <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsTrigger value="parties" className="flex items-center justify-center gap-2">
             <Vote className="h-4 w-4" />
             Parties
           </TabsTrigger>
-          <TabsTrigger value="politicians" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Politicians
-          </TabsTrigger>
-          <TabsTrigger value="candidates" className="flex items-center gap-2">
+          <TabsTrigger value="candidates" className="flex items-center justify-center gap-2">
             <Award className="h-4 w-4" />
             Candidates
           </TabsTrigger>
-          <TabsTrigger value="stats" className="flex items-center gap-2">
+          <TabsTrigger value="stats" className="flex items-center justify-center gap-2">
             <Info className="h-4 w-4" />
             Statistics
           </TabsTrigger>
@@ -151,26 +103,6 @@ const ElectionDashboard = () => {
                     >
                       {party.ctaText}
                     </a>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Politicians Tab */}
-        <TabsContent value="politicians">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {politicians.map((politician) => (
-              <Card key={politician.id}>
-                <CardHeader>
-                  <CardTitle>{politician.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm">Age: {politician.age}</p>
-                    <p className="text-sm">Sex: {politician.sex}</p>
-                    <p className="text-sm">Party: {politician.party.title}</p>
                   </div>
                 </CardContent>
               </Card>
