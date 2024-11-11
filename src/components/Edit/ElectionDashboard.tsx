@@ -35,6 +35,12 @@ interface ElectionData {
   }[];
 }
 
+interface ElectionInfoData {
+  id: number;
+  title: string;
+  description: string;
+}
+
 const ElectionDashboard = () => {
   const [data, setData] = useState<ElectionData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +57,14 @@ const ElectionDashboard = () => {
     ctaLink: '',
     content: '',
   });
+
+  const [isEditingElectionInfo, setIsEditingElectionInfo] = useState(false);
+  const [electionInfoForm, setElectionInfoForm] = useState<ElectionInfoData>({
+    id: 0,
+    title: '',
+    description: '',
+  });
+
 
   // State for editing Candidates
   const [editingCandidateId, setEditingCandidateId] = useState<number | null>(null);
@@ -81,6 +95,15 @@ const [candidateForm, setCandidateForm] = useState({
         }
 
         setData(result.data);
+
+        if (result.data.electionInfo) {
+          setElectionInfoForm({
+            id: result.data.electionInfo.id,
+            title: result.data.electionInfo.title,
+            description: result.data.electionInfo.description,
+          });
+        }
+
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -94,6 +117,68 @@ const [candidateForm, setCandidateForm] = useState({
   // Helper function to get politician details by ID
   const getPolitician = (id: number) => {
     return data?.politicians.find((p) => p.id === id);
+  };
+
+  const handleEditElectionInfo = () => {
+    setIsEditingElectionInfo(true);
+  };
+
+  const handleCancelElectionInfoEdit = () => {
+    if (data?.electionInfo) {
+      setElectionInfoForm({
+        id: data.electionInfo.id,
+        title: data.electionInfo.title,
+        description: data.electionInfo.description,
+      });
+    }
+    setIsEditingElectionInfo(false);
+  };
+
+  // Handler for ElectionInfo form input changes
+  const handleElectionInfoInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setElectionInfoForm({
+      ...electionInfoForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handler for ElectionInfo form submission
+  const handleElectionInfoFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/updateElectionInfo', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(electionInfoForm),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.detail || 'Failed to update election info');
+      }
+
+      // Update local state with the updated ElectionInfo
+      if (data) {
+        setData({
+          ...data,
+          electionInfo: result.data,
+        });
+      }
+
+      // Close the edit form
+      setIsEditingElectionInfo(false);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handlers for editing Parties
@@ -122,6 +207,8 @@ const [candidateForm, setCandidateForm] = useState({
       content: '',
     });
   };
+
+  
 
   // Handler for party form input changes
   const handlePartyInputChange = (
@@ -301,17 +388,79 @@ const [candidateForm, setCandidateForm] = useState({
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Election Info Header */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="w-6 h-6" />
-            {data.electionInfo?.title || 'Upcoming Election'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">{data.electionInfo?.description}</p>
-        </CardContent>
-      </Card>
+{/* Election Info Header */}
+<Card className="mb-6">
+  <CardHeader className="flex justify-between items-center">
+  <CardTitle className="flex items-center justify-between w-full bg-gray-100 p-2">
+  {/* Title Section */}
+  <div className="flex items-center gap-2 bg-blue-100">
+    <Info className="w-6 h-6" />
+    <span>{data.electionInfo?.title || 'Upcoming Election'}</span>
+  </div>
+  
+  {/* Edit Button */}
+  <button
+    onClick={handleEditElectionInfo}
+    className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+  >
+    <Edit3 className="w-4 h-4 mr-1" />
+    Edit
+  </button>
+</CardTitle>
+
+
+  </CardHeader>
+  <CardContent>
+    {isEditingElectionInfo ? (
+      // Edit Form for ElectionInfo
+      <form onSubmit={handleElectionInfoFormSubmit}>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium">Title</label>
+            <input
+              type="text"
+              name="title"
+              value={electionInfoForm.title}
+              onChange={handleElectionInfoInputChange}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Description</label>
+            <textarea
+              name="description"
+              value={electionInfoForm.description}
+              onChange={handleElectionInfoInputChange}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+              required
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-end space-x-2">
+          <button
+            type="button"
+            onClick={handleCancelElectionInfoEdit}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            {isSubmitting ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </form>
+    ) : (
+      // Display ElectionInfo Details
+      <p className="text-gray-600">{data.electionInfo?.description}</p>
+    )}
+  </CardContent>
+</Card>
+
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
