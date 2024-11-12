@@ -4,19 +4,28 @@
 
 import React from 'react';
 
-interface TopCandidate {
-  candidateName: string;
-  _count: {
-    candidateName: number;
-  };
+// Define the PodiumStyle interface
+interface PodiumStyle {
+  podiumHeight: number;
+  beamHeight: number;
+  podiumColor: string;
+  beamColorFrom: string;
+  beamColorTo: string;
+  crownColor: string;
+  personColor: string;
+  trapezoidColor: string;
 }
 
+// Define the props interface
 interface PodiumProps {
-  topThree: TopCandidate[];
+  topThree: Array<{
+    candidateName: string;
+    // Add other candidate-related fields if necessary
+  } | null>; // Assuming topThree can have null values
 }
 
 const Podium: React.FC<PodiumProps> = ({ topThree }) => {
-  const podiumStyles = {
+  const podiumStyles: Record<number, PodiumStyle> = {
     1: {
       podiumHeight: 50,
       beamHeight: 120,
@@ -115,13 +124,14 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
         <div className="flex justify-center items-end space-x-4">
           {arrangedPodium.map((candidate, index) => {
             if (!candidate) {
+              const style = podiumStyles[index + 1];
               return (
                 <div
                   className="flex flex-col items-center"
                   key={`placeholder-${index}`}
                 >
                   <div
-                    className={`w-[160px] h-[${podiumStyles[index + 1].podiumHeight}px] ${podiumStyles[index + 1].podiumColor} shadow-md`}
+                    className={`w-[160px] h-[${style.podiumHeight}px] ${style.podiumColor} shadow-md`}
                   ></div>
                 </div>
               );
@@ -144,7 +154,7 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
                   ></div>
 
                   <div
-                    className={`mt-[-30px] mb-2 float relative z-10`} 
+                    className="mt-[-30px] mb-2 float relative z-10" 
                     style={{ animationDelay: `${index * 0.5}s` }}
                   >
                     <span role="img" aria-label="crown" className={`text-3xl ${style.crownColor}`}>
@@ -152,7 +162,7 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
                     </span>
                   </div>
                   <div
-                    className={`mb-4 float relative z-10`}
+                    className="mb-4 float relative z-10"
                     style={{ animationDelay: `${index * 0.5 + 0.2}s` }}
                   >
                     <span role="img" aria-label="person" className={`text-3xl ${style.personColor}`}>

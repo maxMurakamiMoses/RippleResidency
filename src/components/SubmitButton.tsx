@@ -5,14 +5,20 @@ import { UserCheck, Loader2 } from "lucide-react";
 import React from "react";
 import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
-export function SubmitButton({ onClick, disabled, loading }: any) {
+interface SubmitButtonProps {
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+export function SubmitButton({ onClick, disabled, loading }: SubmitButtonProps) {
   return (
     <div className="w-full">
       <HoverBorderGradient
         containerClassName="rounded-lg w-full"
         as="button"
-        className={`bg-black text-white flex items-center justify-center space-x-2 py-2${
-          disabled ? " opacity-50 cursor-not-allowed" : " "
+        className={`bg-black text-white flex items-center justify-center space-x-2 py-2 ${
+          disabled ? "opacity-50 cursor-not-allowed" : ""
         }`}
         onClick={onClick}
         disabled={disabled}

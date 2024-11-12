@@ -65,7 +65,7 @@ const ElectionDashboard = () => {
   });
 
   const [editingCandidateId, setEditingCandidateId] = useState<number | null>(null);
-const [candidateForm, setCandidateForm] = useState({
+  const [candidateForm, setCandidateForm] = useState<any>({
     id: 0,
     presidentId: 0,
     vicePresidentId: 0,
@@ -247,8 +247,9 @@ const [candidateForm, setCandidateForm] = useState({
       id: 0,
       presidentId: 0,
       vicePresidentId: 0,
-    });
+    } as any);
   };
+  
 
   const handleCandidateFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

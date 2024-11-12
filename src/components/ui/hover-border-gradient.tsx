@@ -1,28 +1,33 @@
-"use client";
-import React, { useState, useEffect, useRef } from "react";
+// File 1: HoverBorderGradient.tsx
 
+"use client";
+import React, { useState, useEffect, ElementType, ComponentPropsWithoutRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Direction = "TOP" | "LEFT" | "BOTTOM" | "RIGHT";
 
-export function HoverBorderGradient({
-  children,
+// Define a generic type for the component
+type HoverBorderGradientProps<T extends ElementType> = {
+  as?: T;
+  containerClassName?: string;
+  className?: string;
+  duration?: number;
+  clockwise?: boolean;
+} & ComponentPropsWithoutRef<T> & {
+  children: React.ReactNode;
+};
+
+export function HoverBorderGradient<T extends ElementType = "button">({
+  as,
   containerClassName,
   className,
-  as: Tag = "button",
   duration = 1,
   clockwise = true,
+  children,
   ...props
-}: React.PropsWithChildren<
-  {
-    as?: React.ElementType;
-    containerClassName?: string;
-    className?: string;
-    duration?: number;
-    clockwise?: boolean;
-  } & React.HTMLAttributes<HTMLElement>
->) {
+}: HoverBorderGradientProps<T>) {
+  const Tag = as || "button";
   const [hovered, setHovered] = useState<boolean>(false);
   const [direction, setDirection] = useState<Direction>("TOP");
 
@@ -55,22 +60,20 @@ export function HoverBorderGradient({
       return () => clearInterval(interval);
     }
   }, [hovered, duration, clockwise]);
-  
+
   return (
     <Tag
-      onMouseEnter={(event: React.MouseEvent<HTMLDivElement>) => {
-        setHovered(true);
-      }}
+      onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={cn(
         "relative flex rounded-lg border border-gray-700 content-center bg-gray-800/20 hover:bg-gray-800/10 transition duration-500 items-center flex-col flex-nowrap gap-2 h-min justify-center overflow-visible p-px decoration-clone",
-        containerClassName // Removed "w-fit" from the default classes
+        containerClassName
       )}
       {...props}
     >
       <div
         className={cn(
-          "w-full text-white z-10 bg-gray-800 px-4 py-2 rounded-lg", // Changed "w-auto" to "w-full"
+          "w-full text-white z-10 bg-gray-800 px-4 py-2 rounded-lg",
           className
         )}
       >
