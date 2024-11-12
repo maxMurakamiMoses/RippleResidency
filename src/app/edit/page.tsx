@@ -4,7 +4,7 @@
 
 import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
-import ElectionDashboard from '@/components/edit/ElectionDashboard';
+import ElectionDashboard from '@/components/Edit/ElectionDashboard';
 
 const Page: React.FC = () => {
   const [password, setPassword] = useState<string>('');
