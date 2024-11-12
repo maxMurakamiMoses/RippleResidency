@@ -1,34 +1,19 @@
-# World ID Next.js Template
+Inspiration:
+- The recent election highlighted to me the critical need for a secure, transparent, and reliable voting platform that truly protects voter information and voting history. Observing the vulnerabilities in the current systems—such as the risks of data breaches, potential tampering, and the lack of confidence many people feel about the integrity of their vote—I felt a strong motivation to innovate in this space. I believe that, in a democratic society, voters deserve a platform that ensures their personal information is kept private, their vote remains anonymous, and the voting history is stored in a way that prevents any form of unauthorized alteration. My goal is to build a solution that addresses these security gaps by implementing the latest encryption methods and blockchain technologies to safeguard every vote cast. 
 
-This is a template repository for creating a new project using Next.js, TailwindCSS, and the [World ID SDK](https://id.worldcoin.org). This template isn't intended for use cases that require on-chain verification, but rather for use cases that leverage off-chain web backend verification.
 
-## Getting Started
+What it does:
+- The platform implements a secure and transparent voting system by storing voting data in both a centralized database and the XRP Ledger. It utilizes two trusted wallets that transfer a minimal amount of XRP for each vote, embedding the voted candidate's name in the transaction memos. This dual-storage approach ensures data integrity and immutability on the blockchain while maintaining the flexibility and accessibility of a centralized database. Votes are tallied by querying the transaction history of the trusted wallets, providing an accurate and verifiable count of total votes cast. Additionally, voters are incentivized for their participation by receiving 1 XRP and a unique NFT upon casting their vote. This combination of blockchain security, privacy-preserving verification, and tangible rewards creates a robust and user-friendly voting platform.
+- To enforce the one-vote-per-person constraint without compromising voter privacy, the platform integrates WorldID and its zero-knowledge proofs. WorldID ensures that each person votes only once while keeping voter identity confidential from both the platform and any third party. Using IDKit, I prompt voters to verify their identity through a seamless, privacy-preserving QR scan. WorldID’s proof verification guarantees each unique voter interaction by creating a unique identifier (nullifier hash) for each user-action combination, effectively preventing duplicate votes.
 
-First, set the correct Node.js version using `nvm` and run the development server:
 
-```bash
-nvm use 20
-pnpm i && pnpm dev
-```
+How I built it:
+- Next.js 14 app router with typescript & tailwind.css.
+- WorldID (WorldCoin)
+- XRPL
 
-Copy `.env.example` to `.env.local` and add your World ID App ID and Action Name to the appropriate variables.
+Challenges I ran into:
+- I ran out of time to create a secure password page when a user edits the election information. If I had more time, I would've created a middleware and authetication system, to make sure only verified individuals can update the election form information.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-This template includes a server action to verify the proof returned by the IDKit widget at `src/app/actions/verify.ts`. Edit this file to handle any backend functions you need to perform after the proof has been verified.
-
-You can start editing the client-side page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file. Edit the `onSuccess` function to define frontend behavior once the proof has been verified.
-
-## Learn More
-
-To learn more about Next.js and World ID, take a look at the following resources:
-
--   [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
--   [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
--   [World ID Documentation](https://docs.worldcoin.org/) - learn about World ID features and API.
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+What I learned:
+I learned a ton about using Next.js 14’s app router and how helpful TypeScript can be for catching bugs early. Working with XRPL gave me hands-on experience with blockchain transactions, and integrating WorldID taught me a lot about secure, privacy-focused user verification.
