@@ -24,13 +24,12 @@ export async function POST(request) {
 
     const wallet = Wallet.fromSeed(seed);
 
-    // Step 1: Mint the NFT
     const mintTx = {
       TransactionType: 'NFTokenMint',
       Account: wallet.classicAddress,
-      URI: convertStringToHex(tokenUrl), // Convert metadata URI to hex
-      Flags: 8, // tfTransferable flag to allow transfer
-      NFTokenTaxon: 0, // Use 0 if you don't have a specific category for this token
+      URI: convertStringToHex(tokenUrl), 
+      Flags: 8, 
+      NFTokenTaxon: 0, 
     };
 
     const mintResponse = await client.submitAndWait(mintTx, { wallet });
@@ -39,7 +38,6 @@ export async function POST(request) {
       throw new Error(`NFT minting failed: ${mintResponse.result.meta.TransactionResult}`);
     }
 
-    // Get the NFT ID from the account's NFTs
     const nfts = await client.request({
       method: 'account_nfts',
       account: wallet.classicAddress
@@ -55,14 +53,13 @@ export async function POST(request) {
 
     const tokenID = mintedNFT.NFTokenID;
 
-    // Step 2: Create a sell offer for 0 XRP to transfer the NFT
     const sellOfferTx = {
       TransactionType: 'NFTokenCreateOffer',
       Account: wallet.classicAddress,
       NFTokenID: tokenID,
-      Amount: '0', // Zero XRP for transfer
-      Flags: 1, // tfSellNFToken flag
-      Destination: walletAddress // Recipient address
+      Amount: '0',
+      Flags: 1, 
+      Destination: walletAddress
     };
 
     const sellOfferResponse = await client.submitAndWait(sellOfferTx, { wallet });
@@ -85,10 +82,8 @@ export async function POST(request) {
 
     const sellOfferIndex = offerNode.CreatedNode.LedgerIndex;
 
-    // Disconnect the client
     await client.disconnect();
 
-    // Return the offer ID for the client to use to accept the offer
     return NextResponse.json({
       success: true,
       detail: 'NFT minted and offer created successfully',

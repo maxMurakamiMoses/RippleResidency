@@ -4,48 +4,42 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-
 export async function PUT(request: NextRequest) {
   try {
-    const { id, title, description } = await request.json();
+    const { id, title, description, emoji, ctaText, ctaLink, content } = await request.json();
 
-    // Validate input
-    if (!id || !title || !description) {
+    if (!id || !title || !description || !emoji || !ctaText || !ctaLink || !content) {
       return NextResponse.json(
-        { success: false, detail: 'All fields are required.' },
+        { success: false, detail: 'This endpoint is still underdevelopment.' },
         { status: 400 }
       );
     }
 
-    // Check if ElectionInfo exists
-    const electionInfo = await prisma.electionInfo.findUnique({
+    const party = await prisma.party.findUnique({
       where: { id: Number(id) },
     });
 
-    if (!electionInfo) {
+    if (!party) {
       return NextResponse.json(
-        { success: false, detail: 'ElectionInfo not found.' },
+        { success: false, detail: 'Party not found.' },
         { status: 404 }
       );
     }
 
-    // Update ElectionInfo
-    const updatedElectionInfo = await prisma.electionInfo.update({
+    const updatedParty = await prisma.party.update({
       where: { id: Number(id) },
-      data: { title, description },
+      data: { title, description, emoji, ctaText, ctaLink, content },
     });
 
     return NextResponse.json(
-      { success: true, data: updatedElectionInfo },
+      { success: true, data: { party: updatedParty } },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error updating ElectionInfo:', error);
+    console.error('Error updating Party:', error);
     return NextResponse.json(
       { success: false, detail: 'Internal Server Error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

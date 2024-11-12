@@ -16,10 +16,10 @@ interface Party {
 interface ElectionData {
   success: boolean;
   data: {
-    electionInfo: any; // Replace with actual type if available
+    electionInfo: any;
     parties: Party[];
-    politicians: any[]; // Replace with actual type if available
-    candidates: any[]; // Replace with actual type if available
+    politicians: any[]; 
+    candidates: any[];
   };
 }
 

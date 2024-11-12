@@ -23,7 +23,6 @@ export async function POST(request) {
 
     const wallet = Wallet.fromSeed(seed);
 
-    // Connect to the XRP Ledger Testnet
     const client = new Client('wss://s.altnet.rippletest.net:51233');
     await client.connect();
 
@@ -35,7 +34,7 @@ export async function POST(request) {
     const preparedTx = await client.autofill({
       TransactionType: 'Payment',
       Account: wallet.address,
-      Amount: xrpToDrops('5'),
+      Amount: xrpToDrops('1'),
       Destination: walletAddress,
     });
 

@@ -9,7 +9,6 @@ export async function POST(request: Request) {
   try {
     const { candidateName, nullifierHash } = await request.json();
 
-    // Input validation
     if (!candidateName || !nullifierHash) {
       return NextResponse.json(
         { success: false, detail: 'Missing candidateName or nullifierHash' },
@@ -17,7 +16,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a new Vote record
     const vote = await prisma.vote.create({
       data: {
         candidateName,
@@ -27,7 +25,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, vote }, { status: 201 });
   } catch (error: any) {
-    // Handle unique constraint violation for nullifierHash
     if (error.code === 'P2002' && error.meta?.target?.includes('nullifierHash')) {
       return NextResponse.json(
         { success: false, detail: 'This vote has already been recorded.' },

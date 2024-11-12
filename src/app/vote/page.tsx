@@ -29,7 +29,6 @@ export default function Home() {
   const { setOpen } = useIDKit();
   const router = useRouter();
 
-  // State management
   const [voteMethod, setVoteMethod] = useState<'select' | 'writeIn'>('select');
   const [selectedCandidate, setSelectedCandidate] = useState<string>('');
   const [writeInName, setWriteInName] = useState('');
@@ -40,19 +39,16 @@ export default function Home() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<CandidateTicket[]>([]);
 
-  // Types for fetched data
   interface Politician {
     id: number;
     name: string;
     age: number;
     partyId: number;
-    // Add other fields as needed
   }
 
   interface Party {
     id: number;
     name: string;
-    // Add other fields as needed
   }
 
   interface Candidate {
@@ -69,7 +65,6 @@ export default function Home() {
     party: Party;
   }
 
-  // Fetch candidates from API
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
@@ -78,8 +73,6 @@ export default function Home() {
         const data = await response.json();
         if (data.success) {
           const { parties, politicians, candidates } = data.data;
-
-          // Build candidate tickets
           const candidateTickets: CandidateTicket[] = candidates.map((candidate: Candidate) => {
             const president = politicians.find((p: Politician) => p.id === candidate.presidentId);
             const vicePresident = politicians.find((p: Politician) => p.id === candidate.vicePresidentId);
@@ -127,24 +120,20 @@ export default function Home() {
   };
 
   const handleProof = async (result: ISuccessResult) => {
-    // Verify the World ID proof
     const data = await verify(result);
     if (data.success) {
       console.log("Successful response from backend:\n", JSON.stringify(data));
     } else {
       setError(`Verification failed: ${data.detail}`);
-      return; // Exit if verification fails
+      return; 
     }
 
     try {
-      // Start loading state and clear any previous errors
       setLoading(true);
       setError(null);
 
-      // Get the selected candidate name based on vote method
       const candidateName = voteMethod === 'select' ? selectedCandidate : writeInName;
 
-      // Save the vote to your database
       const response = await fetch("/api/saveVote", {
         method: "POST",
         headers: {
@@ -156,7 +145,6 @@ export default function Home() {
         }),
       });
 
-      //Save vote to ledger
       const responseLedger = await fetch("/api/saveVoteToLedger", {
         method: "POST",
         headers: {
@@ -170,19 +158,14 @@ export default function Home() {
       const saveVoteData = await response.json();
 
       if (responseLedger.ok && response.ok && saveVoteData.success) {
-        // If vote was saved successfully, process rewards if wallet address provided
-
-        // 1. Send XRP
         if (walletAddress) {
           try {
             await handleSendXrp();
           } catch (err) {
             console.error('Error sending XRP:', err);
-            // Continue even if XRP send fails
           }
         }
 
-        // 2. Send NFT and get the response data
         let nftData = null;
         if (walletAddress) {
           try {
@@ -192,36 +175,28 @@ export default function Home() {
           }
         }
 
-        // 3. Build the success URL with parameters
         const successParams = new URLSearchParams();
 
         if (walletAddress) {
-          // Add wallet address to URL params
           successParams.append('walletAddress', walletAddress);
 
-          // Add sell offer index if NFT was successfully created
           if (nftData?.sellOfferIndex) {
             successParams.append('sellOfferIndex', nftData.sellOfferIndex);
           }
         }
 
         console.log('This is your nftData: ', nftData);
-
-        // 4. Redirect to success page with parameters
         router.push(`/success?${successParams.toString()}`);
 
       } else {
-        // If vote saving failed, show error
         setError(saveVoteData.detail || "Failed to save your vote.");
       }
 
     } catch (err) {
-      // Handle any unexpected errors
       console.error("Error during voting:", err);
       setError("An unexpected error occurred.");
 
     } finally {
-      // Always turn off loading state
       setLoading(false);
     }
   };
@@ -269,11 +244,10 @@ export default function Home() {
           },
           body: JSON.stringify({
             walletAddress,
-            tokenUrl: 'https://example.com/nft-metadata' // Replace with your actual metadata URL
+            tokenUrl: 'https://example.com/nft-metadata'
           }),
         });
 
-        // Parse the response to get nftData
         const nftData = await nftResponse.json();
 
         console.log('NFT Transfer Response:', nftData);
@@ -285,11 +259,11 @@ export default function Home() {
           setError(`NFT minting failed: ${nftData.detail}`);
         }
 
-        return nftData; // Return the parsed data
+        return nftData; 
       } catch (error: any) {
         console.error('Error minting NFT:', error);
         setError(`Error minting NFT: ${error.message}`);
-        throw error; // Re-throw the error to be caught in handleProof
+        throw error; 
       }
     } else {
       console.log('No wallet address provided, NFT not sent.');
@@ -304,7 +278,6 @@ export default function Home() {
         <Separator />
       </div>
       <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-        {/* Conditional Rendering of MultiStep Components */}
         {walletAddress ? (
           <MultiStep loading={loading} />
         ) : (
@@ -312,7 +285,6 @@ export default function Home() {
         )}
 
         <div className="max-w-3xl mx-auto">
-          {/* Candidate Cards Grid */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
               <Users className="h-6 w-6 text-blue-400" />
@@ -374,8 +346,6 @@ export default function Home() {
               />
             </div>
           </div>
-
-          {/* Wallet Address Input */}
           <div className="mb-8">
             <label htmlFor="walletAddress" className="block text-sm font-medium text-gray-300">
               Wallet Address (optional)
@@ -389,8 +359,6 @@ export default function Home() {
               placeholder="Enter XRP wallet address..."
             />
           </div>
-
-          {/* Verification Section */}
           <div className="space-y-4">
             <IDKitWidget
               action={action}
@@ -405,8 +373,6 @@ export default function Home() {
               disabled={!isVoteValid || loading}
               loading={loading}
             />
-
-            {/* Error Message */}
             {error && (
               <div className="flex items-center gap-2 text-red-400 bg-red-900 p-4 rounded-lg">
                 <AlertCircle className="h-5 w-5" />

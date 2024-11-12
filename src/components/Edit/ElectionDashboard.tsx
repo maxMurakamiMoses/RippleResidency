@@ -46,7 +46,6 @@ const ElectionDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // State for editing Parties
   const [editingPartyId, setEditingPartyId] = useState<number | null>(null);
   const [partyForm, setPartyForm] = useState({
     id: 0,
@@ -65,10 +64,7 @@ const ElectionDashboard = () => {
     description: '',
   });
 
-
-  // State for editing Candidates
   const [editingCandidateId, setEditingCandidateId] = useState<number | null>(null);
-// Add new fields to candidateForm state
 const [candidateForm, setCandidateForm] = useState({
     id: 0,
     presidentId: 0,
@@ -114,7 +110,6 @@ const [candidateForm, setCandidateForm] = useState({
     fetchData();
   }, []);
 
-  // Helper function to get politician details by ID
   const getPolitician = (id: number) => {
     return data?.politicians.find((p) => p.id === id);
   };
@@ -134,7 +129,6 @@ const [candidateForm, setCandidateForm] = useState({
     setIsEditingElectionInfo(false);
   };
 
-  // Handler for ElectionInfo form input changes
   const handleElectionInfoInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -144,7 +138,6 @@ const [candidateForm, setCandidateForm] = useState({
     });
   };
 
-  // Handler for ElectionInfo form submission
   const handleElectionInfoFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -164,7 +157,6 @@ const [candidateForm, setCandidateForm] = useState({
         throw new Error(result.detail || 'Failed to update election info');
       }
 
-      // Update local state with the updated ElectionInfo
       if (data) {
         setData({
           ...data,
@@ -172,7 +164,6 @@ const [candidateForm, setCandidateForm] = useState({
         });
       }
 
-      // Close the edit form
       setIsEditingElectionInfo(false);
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
@@ -181,9 +172,6 @@ const [candidateForm, setCandidateForm] = useState({
     }
   };
 
-  // Handlers for editing Parties
-
-  // Handler to open edit form for a party
   const handleEditPartyClick = (partyId: number) => {
     if (data) {
       const party = data.parties.find((p) => p.id === partyId);
@@ -194,7 +182,6 @@ const [candidateForm, setCandidateForm] = useState({
     }
   };
 
-  // Handler to close edit form for a party
   const handleCancelPartyEdit = () => {
     setEditingPartyId(null);
     setPartyForm({
@@ -208,9 +195,6 @@ const [candidateForm, setCandidateForm] = useState({
     });
   };
 
-  
-
-  // Handler for party form input changes
   const handlePartyInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -220,60 +204,19 @@ const [candidateForm, setCandidateForm] = useState({
     });
   };
 
-  // Handler for party form submission
   const handlePartyFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     try {
-        const response = await fetch('/api/updateCandidate', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(candidateForm),
-        });
-    
-        const result = await response.json();
-    
-        if (!result.success) {
-          throw new Error(result.detail || 'Failed to update candidate');
-        }
-    
-        // Update local state with the updated candidate and politicians data
-        if (data) {
-          const updatedCandidates = data.candidates.map((candidate) =>
-            candidate.id === candidateForm.id ? result.data.candidate : candidate
-          );
-    
-          const updatedPoliticians = data.politicians.map((politician) => {
-            if (politician.id === result.data.president.id) {
-              return result.data.president;
-            } else if (politician.id === result.data.vicePresident.id) {
-              return result.data.vicePresident;
-            } else {
-              return politician;
-            }
-          });
-    
-          setData({
-            ...data,
-            candidates: updatedCandidates,
-            politicians: updatedPoliticians,
-          });
-        }
-    
-        // Close the edit form
-        handleCancelCandidateEdit();
-      } catch (err) {
-        alert(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-  // Handlers for editing Candidates
-
-  // Handler to open edit form for a candidate
+        console.log('API endpoint under development.')
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
   const handleEditCandidateClick = (candidateId: number) => {
     if (data) {
       const candidate = data.candidates.find((c) => c.id === candidateId);
@@ -298,7 +241,6 @@ const [candidateForm, setCandidateForm] = useState({
   };
   
 
-  // Handler to close edit form for a candidate
   const handleCancelCandidateEdit = () => {
     setEditingCandidateId(null);
     setCandidateForm({
@@ -308,7 +250,6 @@ const [candidateForm, setCandidateForm] = useState({
     });
   };
 
-  // Handler for candidate form submission
   const handleCandidateFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -328,7 +269,6 @@ const [candidateForm, setCandidateForm] = useState({
         throw new Error(result.detail || 'Failed to update candidate');
       }
   
-      // Update local state with the updated candidate and politicians data
       if (data) {
         const updatedCandidates = data.candidates.map((candidate) =>
           candidate.id === candidateForm.id ? result.data.candidate : candidate
@@ -351,7 +291,6 @@ const [candidateForm, setCandidateForm] = useState({
         });
       }
   
-      // Close the edit form
       handleCancelCandidateEdit();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'An error occurred');
@@ -387,18 +326,14 @@ const [candidateForm, setCandidateForm] = useState({
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* Election Info Header */}
-{/* Election Info Header */}
 <Card className="mb-6">
   <CardHeader className="flex justify-between items-center">
   <CardTitle className="flex items-center justify-between w-full bg-gray-100 p-2">
-  {/* Title Section */}
   <div className="flex items-center gap-2 bg-blue-100">
     <Info className="w-6 h-6" />
     <span>{data.electionInfo?.title || 'Upcoming Election'}</span>
   </div>
   
-  {/* Edit Button */}
   <button
     onClick={handleEditElectionInfo}
     className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
@@ -412,7 +347,6 @@ const [candidateForm, setCandidateForm] = useState({
   </CardHeader>
   <CardContent>
     {isEditingElectionInfo ? (
-      // Edit Form for ElectionInfo
       <form onSubmit={handleElectionInfoFormSubmit}>
         <div className="space-y-4">
           <div>
@@ -455,7 +389,6 @@ const [candidateForm, setCandidateForm] = useState({
         </div>
       </form>
     ) : (
-      // Display ElectionInfo Details
       <p className="text-gray-600">{data.electionInfo?.description}</p>
     )}
   </CardContent>
@@ -471,7 +404,6 @@ const [candidateForm, setCandidateForm] = useState({
 
         <TabsContent value="overview">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Election Statistics */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -501,7 +433,6 @@ const [candidateForm, setCandidateForm] = useState({
               </CardContent>
             </Card>
 
-            {/* Quick Links */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -536,160 +467,152 @@ const [candidateForm, setCandidateForm] = useState({
 
               return (
                 <Card key={candidate.id} className="overflow-hidden">
-<CardHeader className="bg-gray-50 flex flex-row justify-between items-center w-full flex-nowrap">
-  <span className="text-lg font-medium">
-    Candidate Pair #{candidate.id}
-  </span>
-  <button
-    onClick={() => handleEditCandidateClick(candidate.id)}
-    className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-  >
-    <Edit3 className="w-4 h-4 mr-1" />
-    Edit
-  </button>
-</CardHeader>
-
-
-
+                  <CardHeader className="bg-gray-50 flex flex-row justify-between items-center w-full flex-nowrap">
+                    <span className="text-lg font-medium">
+                      Candidate Pair #{candidate.id}
+                    </span>
+                    <button
+                      onClick={() => handleEditCandidateClick(candidate.id)}
+                      className="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                    >
+                      <Edit3 className="w-4 h-4 mr-1" />
+                      Edit
+                    </button>
+                  </CardHeader>
                   <CardContent className="mt-4">
                   {editingCandidateId === candidate.id ? (
-  // Edit Form for Candidate
-  <form onSubmit={handleCandidateFormSubmit}>
-    <div className="space-y-4">
-      {/* Presidential Candidate */}
-      <div className="p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-semibold text-lg mb-3">
-          Presidential Candidate
-        </h3>
-        <div className="space-y-2">
-          <div>
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              type="text"
-              name="presidentName"
-              value={candidateForm.presidentName}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  presidentName: e.target.value,
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Age</label>
-            <input
-              type="number"
-              name="presidentAge"
-              value={candidateForm.presidentAge}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  presidentAge: Number(e.target.value),
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Sex</label>
-            <input
-              type="text"
-              name="presidentSex"
-              value={candidateForm.presidentSex}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  presidentSex: e.target.value,
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-        </div>
-      </div>
-      {/* Vice Presidential Candidate */}
-      <div className="p-4 bg-green-50 rounded-lg">
-        <h3 className="font-semibold text-lg mb-3">
-          Vice Presidential Candidate
-        </h3>
-        <div className="space-y-2">
-          <div>
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              type="text"
-              name="vicePresidentName"
-              value={candidateForm.vicePresidentName}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  vicePresidentName: e.target.value,
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Age</label>
-            <input
-              type="number"
-              name="vicePresidentAge"
-              value={candidateForm.vicePresidentAge}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  vicePresidentAge: Number(e.target.value),
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Sex</label>
-            <input
-              type="text"
-              name="vicePresidentSex"
-              value={candidateForm.vicePresidentSex}
-              onChange={(e) =>
-                setCandidateForm({
-                  ...candidateForm,
-                  vicePresidentSex: e.target.value,
-                })
-              }
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-              required
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="mt-4 flex items-center justify-end space-x-2">
-      <button
-        type="button"
-        onClick={handleCancelCandidateEdit}
-        className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-      >
-        {isSubmitting ? 'Saving...' : 'Save'}
-      </button>
-    </div>
-  </form>
+                    <form onSubmit={handleCandidateFormSubmit}>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-blue-50 rounded-lg">
+                          <h3 className="font-semibold text-lg mb-3">
+                            Presidential Candidate
+                          </h3>
+                          <div className="space-y-2">
+                            <div>
+                              <label className="block text-sm font-medium">Name</label>
+                              <input
+                                type="text"
+                                name="presidentName"
+                                value={candidateForm.presidentName}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    presidentName: e.target.value,
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium">Age</label>
+                              <input
+                                type="number"
+                                name="presidentAge"
+                                value={candidateForm.presidentAge}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    presidentAge: Number(e.target.value),
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium">Sex</label>
+                              <input
+                                type="text"
+                                name="presidentSex"
+                                value={candidateForm.presidentSex}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    presidentSex: e.target.value,
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-4 bg-green-50 rounded-lg">
+                          <h3 className="font-semibold text-lg mb-3">
+                            Vice Presidential Candidate
+                          </h3>
+                          <div className="space-y-2">
+                            <div>
+                              <label className="block text-sm font-medium">Name</label>
+                              <input
+                                type="text"
+                                name="vicePresidentName"
+                                value={candidateForm.vicePresidentName}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    vicePresidentName: e.target.value,
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium">Age</label>
+                              <input
+                                type="number"
+                                name="vicePresidentAge"
+                                value={candidateForm.vicePresidentAge}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    vicePresidentAge: Number(e.target.value),
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium">Sex</label>
+                              <input
+                                type="text"
+                                name="vicePresidentSex"
+                                value={candidateForm.vicePresidentSex}
+                                onChange={(e) =>
+                                  setCandidateForm({
+                                    ...candidateForm,
+                                    vicePresidentSex: e.target.value,
+                                  })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                required
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center justify-end space-x-2">
+                        <button
+                          type="button"
+                          onClick={handleCancelCandidateEdit}
+                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        >
+                          {isSubmitting ? 'Saving...' : 'Save'}
+                        </button>
+                      </div>
+                    </form>
                     ) : (
-                      // Display Candidate Details
                       <div className="space-y-6">
-                        {/* President Details */}
                         <div className="p-4 bg-blue-50 rounded-lg">
                           <h3 className="font-semibold text-lg mb-3">
                             Presidential Candidate
@@ -706,8 +629,6 @@ const [candidateForm, setCandidateForm] = useState({
                             </div>
                           </div>
                         </div>
-
-                        {/* Vice President Details */}
                         <div className="p-4 bg-green-50 rounded-lg">
                           <h3 className="font-semibold text-lg mb-3">
                             Vice Presidential Candidate
@@ -745,7 +666,6 @@ const [candidateForm, setCandidateForm] = useState({
                 </CardHeader>
                 <CardContent>
                   {editingPartyId === party.id ? (
-                    // Edit Form for Party
                     <form onSubmit={handlePartyFormSubmit}>
                       <div className="space-y-4">
                         <div>

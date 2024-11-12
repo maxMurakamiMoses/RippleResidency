@@ -15,7 +15,7 @@ interface ApiResponse {
   success: boolean;
   data?: {
     electionInfo: ElectionInfo;
-    parties: any[]; // Replace `any` with actual types if available
+    parties: any[]; 
     politicians: any[];
     candidates: any[];
   };
@@ -23,7 +23,7 @@ interface ApiResponse {
 }
 
 interface TextRevealProps {
-  // You can pass additional props if needed
+
 }
 
 export function TextReveal({}: TextRevealProps) {

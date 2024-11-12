@@ -16,7 +16,6 @@ interface PodiumProps {
 }
 
 const Podium: React.FC<PodiumProps> = ({ topThree }) => {
-  // Define default styling for podium based on rank
   const podiumStyles = {
     1: {
       podiumHeight: 50,
@@ -50,7 +49,6 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
     },
   };
 
-  // Arrange the podium in [2nd, 1st, 3rd] order
   const arrangedPodium = [
     topThree[1] || null, // 2nd place
     topThree[0] || null, // 1st place
@@ -63,7 +61,6 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
 
   return (
     <div className="flex flex-col items-center p-4">
-      {/* Define all animation styles */}
       <style>
         {`
           /* Floating animation for podium characters */
@@ -115,11 +112,9 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
       </style>
 
       <div style={{ width: `${totalWidth}px` }} className="flex flex-col items-center">
-        {/* Podium Section */}
         <div className="flex justify-center items-end space-x-4">
           {arrangedPodium.map((candidate, index) => {
             if (!candidate) {
-              // Handle cases where there are fewer than 3 candidates
               return (
                 <div
                   className="flex flex-col items-center"
@@ -132,25 +127,24 @@ const Podium: React.FC<PodiumProps> = ({ topThree }) => {
               );
             }
 
-            const rank = index === 1 ? 1 : index === 0 ? 2 : 3; // Adjust rank based on position
+            const rank = index === 1 ? 1 : index === 0 ? 2 : 3;
             const style = podiumStyles[rank];
 
             return (
               <div
-                className="flex flex-col items-center podium-item group" // Added 'group' class
+                className="flex flex-col items-center podium-item group" 
                 key={candidate.candidateName}
               >
                 <div
                   className={`relative flex flex-col items-center justify-start bg-gradient-to-t ${style.beamColorFrom} ${style.beamColorTo}`}
                   style={{ height: `${style.beamHeight}px`, width: `${podiumWidth}px` }}
                 >
-                  {/* Beam Reveal Overlay */}
                   <div
                     className={`absolute bottom-0 left-0 w-full h-full bg-gradient-to-t ${style.beamColorFrom} ${style.beamColorTo} transform scale-y-0 origin-bottom group-hover:scale-y-100 transition-transform duration-500 ease-out`}
                   ></div>
 
                   <div
-                    className={`mt-[-30px] mb-2 float relative z-10`} // Ensure content is above the beam overlay
+                    className={`mt-[-30px] mb-2 float relative z-10`} 
                     style={{ animationDelay: `${index * 0.5}s` }}
                   >
                     <span role="img" aria-label="crown" className={`text-3xl ${style.crownColor}`}>

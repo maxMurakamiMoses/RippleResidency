@@ -20,13 +20,12 @@ export async function GET() {
 
     const votes = {};
 
-    // Fetch transactions sent from the trusted wallet
     const response = await client.request({
       command: 'account_tx',
       account: wallet.address,
-      ledger_index_min: -1, // Fetch from earliest available ledger
-      ledger_index_max: -1, // Up to the latest ledger
-      limit: 100, // Adjust limit as needed for batch processing
+      ledger_index_min: -1, 
+      ledger_index_max: -1, 
+      limit: 100, 
     });
 
     response.result.transactions.forEach((tx) => {
@@ -37,7 +36,7 @@ export async function GET() {
             const vote = JSON.parse(memoData).vote;
 
             if (vote) {
-              votes[vote] = (votes[vote] || 0) + 1; // Tally the votes
+              votes[vote] = (votes[vote] || 0) + 1; 
             }
           } catch (e) {
             console.error('Error parsing memo:', e);

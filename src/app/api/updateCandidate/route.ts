@@ -42,7 +42,6 @@ export async function PUT(request: NextRequest) {
         );
       }
   
-      // Update President
       const updatedPresident = await prisma.politician.update({
         where: { id: candidate.presidentId },
         data: {
@@ -52,7 +51,6 @@ export async function PUT(request: NextRequest) {
         },
       });
   
-      // Update Vice President
       const updatedVicePresident = await prisma.politician.update({
         where: { id: candidate.vicePresidentId },
         data: {

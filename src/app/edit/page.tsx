@@ -11,7 +11,6 @@ const Page: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
-  // Retrieve the password from environment variables
   const PAGE_PASSWORD: string | undefined = process.env.NEXT_PUBLIC_PAGE_PASSWORD;
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -48,7 +47,6 @@ const Page: React.FC = () => {
           </Link>
         </div>
 
-        {/* Election Dashboard */}
         <ElectionDashboard />
       </div>
     );
@@ -75,7 +73,6 @@ const Page: React.FC = () => {
   );
 };
 
-// Simple inline styles for the form
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     display: 'flex',

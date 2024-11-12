@@ -36,14 +36,12 @@ export const VoteCountsPieChart: React.FC<VoteCountsChartProps> = ({
     "var(--color-chart-8)",
   ];
 
-  // Transform voteCounts data to fit the chart's expected format
   const chartData = voteCounts.map((vote, index) => ({
     name: vote.candidateName,
     value: vote._count.candidateName,
     fill: colorPalette[index % colorPalette.length],
   }));
 
-  // Configure chart settings dynamically based on candidates
   const chartConfig: ChartConfig = voteCounts.reduce((config, vote, index) => {
     config[vote.candidateName] = {
       label: vote.candidateName,
@@ -52,20 +50,11 @@ export const VoteCountsPieChart: React.FC<VoteCountsChartProps> = ({
     return config;
   }, {} as ChartConfig);
 
-  // Calculate total votes for trend calculation (optional)
   const totalVotes = chartData.reduce((sum, item) => sum + item.value, 0);
-  const trendingPercentage = 5.2; // Replace with dynamic calculation if needed
+  const trendingPercentage = 5.2; 
 
   return (
     <div className="w-full max-w-md mx-auto p-4 rounded-lg">
-      {/* Optional Header */}
-      {/* If you still want to include a title or description, you can add them here */}
-      {/* 
-      <div className="mb-4 text-center">
-        <h2 className="text-xl font-semibold text-gray-100">Vote Counts</h2>
-        <p className="text-gray-400">Current Vote Distribution</p>
-      </div>
-      */}
       <ChartContainer
         config={chartConfig}
         className="relative mx-auto aspect-square max-h-[250px] [&_.recharts-pie-label-text]:fill-white"

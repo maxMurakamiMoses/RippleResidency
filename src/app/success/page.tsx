@@ -13,7 +13,6 @@ import VoteResultsToggle from "@/components/success/VoteResultsToggle";
 
 const prisma = new PrismaClient();
 
-// Add interface for searchParams
 interface SuccessPageProps {
   searchParams: {
     sellOfferIndex?: string;
@@ -21,7 +20,6 @@ interface SuccessPageProps {
   };
 }
 
-// Define an interface for vote counts
 interface VoteCount {
   candidateName: string;
   _count: {
@@ -50,14 +48,12 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   const sellOfferIndex = searchParams.sellOfferIndex;
   const walletAddress = searchParams.walletAddress;
 
-  // Extract top 3 candidates
   const topThree = voteCounts.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
 
-        {/* NFT Transfer Details */}
         {walletAddress && (
           <Card className="mb-8 bg-blue-900">
             <CardHeader>
@@ -101,7 +97,6 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
           </div>
         </div>
 
-        {/* Vote Results Toggle */}
         <VoteResultsToggle />
 
         <div className="mb-8 flex flex-col items-start sm:flex-row sm:justify-start sm:space-x-4">
@@ -115,7 +110,6 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
             </p>
           </div>
         </div>
-        {/* Vote Counts Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {voteCounts.map((vote) => (
             <Card key={vote.candidateName} className="shadow-md bg-gray-800">

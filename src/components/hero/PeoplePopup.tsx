@@ -10,9 +10,8 @@ const robotoMono = Roboto_Mono({
   variable: '--font-roboto-mono',
 });
 
-// Define TypeScript interfaces based on API response
 interface Politician {
-  id: string; // Assuming each politician has a unique ID
+  id: string;
   name: string;
   age: number;
   sex: string;
@@ -22,10 +21,10 @@ interface Politician {
 interface ElectionData {
   success: boolean;
   data: {
-    electionInfo: any; // Replace with actual type if available
-    parties: any[]; // Replace with actual type if available
+    electionInfo: any; 
+    parties: any[]; 
     politicians: Politician[];
-    candidates: any[]; // Replace with actual type if available
+    candidates: any[]; 
   };
 }
 
@@ -35,7 +34,7 @@ interface Popup extends Politician {
   isFadingOut: boolean;
 }
 
-let popupId = 0; // Unique identifier for each popup
+let popupId = 0; 
 
 export function PeoplePopup() {
   const [popups, setPopups] = useState<Popup[]>([]);
@@ -58,7 +57,6 @@ export function PeoplePopup() {
         }
         const result: ElectionData = await response.json();
         if (result.success) {
-          // Extract politicians from the fetched data
           setPoliticians(result.data.politicians);
         } else {
           throw new Error('Failed to fetch election data.');
@@ -106,7 +104,7 @@ export function PeoplePopup() {
 
   const addPopup = () => {
     if (currentPopupIndex.current >= politicians.length) {
-      currentPopupIndex.current = 0; // Reset to start if we've shown all popups
+      currentPopupIndex.current = 0;
     }
 
     const politician = politicians[currentPopupIndex.current];
@@ -117,8 +115,8 @@ export function PeoplePopup() {
 
     const containerRect = container.getBoundingClientRect();
 
-    const popupWidth = 250; // Increased width to accommodate text
-    const popupHeight = 200; // Adjusted height for the new layout
+    const popupWidth = 250;
+    const popupHeight = 200; 
 
     const top = Math.random() * (containerRect.height - popupHeight);
     const left = Math.random() * (containerRect.width - popupWidth);
@@ -143,7 +141,7 @@ export function PeoplePopup() {
         setPopups((prevPopups) =>
           prevPopups.filter((popup) => popup.id !== newPopup.id)
         );
-      }, 500); // Duration of fade-out animation (0.5s)
+      }, 500);
     }, 5000);
   };
 
@@ -182,35 +180,19 @@ export function PeoplePopup() {
             zIndex: 20, 
           }}
         >
-          {/* First Row: Optional Generic Icon */}
           <div className="flex flex-row items-center mb-2">
-            {/* Uncomment the following block to display the generic user icon */}
-            {/*
-            <div className="relative w-16 h-16 text-gray-400 mr-4">
-              <FaUserCircle size={64} />
-            </div>
-            */}
-            {/* Text Container */}
             <div className="flex flex-col">
-              {/* Name */}
               <span className="text-lg font-semibold text-gray-200">
                 {popup.name}
               </span>
-
-              {/* Age and Sex */}
               <span className="text-sm font-medium text-gray-400">
                 {popup.sex}, {popup.age} yrs
               </span>
-
-              {/* Party */}
               <span className="text-sm font-medium text-gray-400">
                 {popup.party}
               </span>
             </div>
           </div>
-
-          {/* Optional: Additional Information or Actions */}
-          {/* You can add more rows or details here if needed */}
         </div>
       ))}
 
